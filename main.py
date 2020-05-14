@@ -52,7 +52,7 @@ userInputForGameTimeLim = input ("Enter how long to run the program in Minutes: 
 gameTimeLimitMin = int(userInputForGameTimeLim)
 gameTimeLimitSec = gameTimeLimitMin * 60
 
-basicDNA = [8, .0001 , 1000, "㋺"]
+basicDNA = [1, .005 , 120, "㋺"]
 cell1 = cell(basicDNA, 3, 3, len(entityList))
 entityList.append(cell1)
 gameStartTime = datetime.datetime.now()
@@ -100,7 +100,7 @@ while end == False and (datetime.datetime.now() - gameStartTime).total_seconds()
     for i in range(len(entityList)):
         #print(entityList[i].info())
         entityList[i].update(gameSpace, entityList)
-        print(entityList[i].info())
+        #print(entityList[i].info())
     
 
     gameTick += 1

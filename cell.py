@@ -134,10 +134,11 @@ class cell:
     def mitosis(self, entitylist):
         
         
-        self.mutate()
+       
         c = 0
         for x in entitylist :
             if isinstance(x, emptySlot) :
+                self.mutate()
                 entitylist[x.ID] = cell((self.DNA),self.x + random.randint(-1,1),self.y + random.randint(-1,1),x.ID)
                 break
             else:
@@ -145,7 +146,7 @@ class cell:
         if c == len(entitylist) :
             entitylist.append(cell(self.DNA,self.x + random.randint(-1,1),self.y + random.randint(-1,1),len(entitylist)))
         
-        
+        self.mutate()
         entitylist[self.ID] = cell(self.DNA,self.x + random.randint(-1,1),self.y + random.randint(-1,1),self.ID)
        
 
@@ -181,7 +182,7 @@ class cell:
 
             
  
-        print(self.neuron.info())
+        #print(self.neuron.info())
 
         self.HP -= self.age/100 * self.DNA[1]
         self.homeostasis()

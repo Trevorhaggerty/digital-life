@@ -144,7 +144,7 @@ class neuron : #will hopefully be the building block for a neural network
         
         
         if len(self.soma.inputMemory) > 9 :
-            if all(self.soma.inputMemory): # and (int((self.soma.signalMemory[-1]) * 10000) == int((sum(self.soma.signalMemory) / len(self.soma.signalMemory) * 10000 ) ) ):
+            if all(self.soma.inputMemory) and (int((self.soma.signalMemory[-1]) * 10000) == int((sum(self.soma.signalMemory) / len(self.soma.signalMemory) * 10000 ) ) ):
                 for i in range(len(self.dendrite.synapticWeight)) :
                     self.dendrite.synapticWeight[i] = random.random()
                 self.axon.HillockBias = random.random()
