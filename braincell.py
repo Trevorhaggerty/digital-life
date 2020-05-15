@@ -1,9 +1,0 @@
-#braincell
-from neuron inport *
-
-
-
-
-
-
-
