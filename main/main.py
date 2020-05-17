@@ -31,12 +31,15 @@ def clearScreen():
 userInputForGameTimeLim = input ("Enter how long to run the program in Ticks: ")
 gameTimeLimit = int(userInputForGameTimeLim)
 
-basicDNA = [1, .0001 , 200, "㋺", 6, 0]
-cell1 = cell(basicDNA, 3, 3, len(entityList))
+basicDNA = [1, .0001 , 200, "㋺", 2, 6]
+
+cell1 = cell(basicDNA, random.randint(0,gameRange[0]-1), random.randint(0,gameRange[1]), len(entityList))
+cell1.mutate()
 entityList.append(cell1)
+
 gameStartTime = datetime.datetime.now()
 
-entityList.append(foodPellet(8,9,5, len(entityList)))
+entityList.append(foodPellet(0,0,5, len(entityList)))
 
 
 #mainloop----------------------------------------

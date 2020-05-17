@@ -27,7 +27,7 @@ class foodPellet :
         self.updateCount = 0
     def update(self, gameSpace, entitylist) :
         self.updateCount +=1
-        if self.drift == True and self.updateCount % random.randint(1,50) == random.randint(1,50):
+        if self.drift == True and self.updateCount % random.randint(1,10) == random.randint(1,10):
             direction = random.randint(0,4)
             if direction == 1 and self.y > 0:
                 self.y -= 1
@@ -52,10 +52,10 @@ class cell:
         self.x = x
         self.y = y
         self.ID = ID
-        self.appearance = [DNA[3],DNA[4],DNA[5]]
+        self.appearance = [self.DNA[3],self.DNA[4],self.DNA[5]]
         self.neuron = neuron(self.DNA, 0, 0 ,0)
         self.entityType = 2
-        self.inputs = [[],[]]
+        self.inputs = [0,0,0,0]
         self.updateCount = 0
     
     def cellMovement(self, gameSpace, direction) :   #0 is north, 1 east, 2 south, 3 west
@@ -69,8 +69,7 @@ class cell:
             self.x -= 1
 
     def perception(self, gameSpace, entitylist) :
-        self.inputs = [0,0,0,0] #blind inputs
-
+        
         #look north fill the first spot with -1 for nothing, 0 and up that say the distance north
         if self.y > 0:
             for x in range((len(gameSpace))):
@@ -79,6 +78,8 @@ class cell:
                         if z.x == x and z.y == y :
                             if z.entityType == 1 :
                                 self.inputs[0] = sigmoid((self.y - y))
+        else :
+            self.inputs[0] = -1
         
         if self.x < len(gameSpace)-1 :
             for x in range(self.x, (len(gameSpace))):
@@ -86,7 +87,9 @@ class cell:
                     for z in entitylist :
                         if z.x == x and z.y == y :
                             if z.entityType == 1 :
-                                self.inputs[1] = - sigmoid((x - self.x))
+                                self.inputs[1] = sigmoid((x - self.x))
+        else :
+            self.inputs[1] = -1
 
         if self.y < len(gameSpace[0])-1 :
             for x in range((len(gameSpace))):
@@ -94,8 +97,9 @@ class cell:
                     for z in entitylist :
                         if z.x == x and z.y == y :
                             if z.entityType == 1 :
-                                self.inputs[2] = - sigmoid((y - self.y))
-        
+                                self.inputs[2] = sigmoid((y - self.y))
+        else :
+            self.inputs[2] = -1
         if self.y > 0:
             for x in range(self.x):
                 for y in range(len(gameSpace[0])) :
@@ -103,9 +107,10 @@ class cell:
                         if z.x == x and z.y == y :
                             if z.entityType == 1 :
                                 self.inputs[3] = sigmoid((self.x - x))
-
-
-        return self.inputs
+        else :
+            self.inputs[3] = -1
+        retI = self.inputs
+        return retI
 
     def homeostasis(self):
         self.age = self.updateCount / 25 #(datetime.datetime.now() - self.birthDateTime).total_seconds()
@@ -122,9 +127,10 @@ class cell:
             glitch = random.randint(-1,1)
             if i != 3: 
                 self.DNA[i] += glitch
-            else :
-                self.DNA[i] = chr(ord(self.DNA[i]) + glitch)
+                
             i += 1
+        self.DNA[3] = chr(ord(self.DNA[3]) + glitch)
+        self.appearance = [self.DNA[3],self.DNA[4],self.DNA[5]]
 
 
     def apoptosis(self, entitylist):
@@ -152,22 +158,23 @@ class cell:
     
     def update(self, gameSpace, entitylist) :
         self.updateCount += 1
+        self.perception(gameSpace, entitylist)
 
         if self.neuron.dendrite.backFlowing == False and self.neuron.axon.feedingForward == False :
             self.neuron.dendrite.dendriticTree = self.perception(gameSpace, entitylist)
             self.neuron.update()
         elif self.neuron.dendrite.backFlowing == False and self.neuron.axon.feedingForward == True :
             #print(str(int(self.neuron.axon.telodendrites[0] * 4)))
-            self.cellMovement(gameSpace, int(round(self.neuron.axon.telodendrites[0] * 4)))
+            self.cellMovement(gameSpace, int((round(self.neuron.axon.telodendrites[0]) + 1) * 2 ))
             self.neuron.axon.telodendrites[0] = 0
             self.neuron.update()
             #back propogate correct answer
             if self.perception(gameSpace, entitylist)[0] == max(self.perception(gameSpace, entitylist)) :
-                self.neuron.axon.telodendrites[0] = 0.25 
+                self.neuron.axon.telodendrites[0] = -1 
             elif self.perception(gameSpace, entitylist)[1] == max(self.perception(gameSpace, entitylist)) :
-                self.neuron.axon.telodendrites[0] = 0.50
+                self.neuron.axon.telodendrites[0] = -0.5
             elif self.perception(gameSpace, entitylist)[2] == max(self.perception(gameSpace, entitylist)) :
-                self.neuron.axon.telodendrites[0] = 0.75
+                self.neuron.axon.telodendrites[0] = 0.5
             elif self.perception(gameSpace, entitylist)[3] == max(self.perception(gameSpace, entitylist)) :
                 self.neuron.axon.telodendrites[0] = 1
             self.neuron.update()
@@ -192,9 +199,10 @@ class cell:
 
 
     def info(self) :
-        info =        "look =" + self.appearance + "| sight =" + str(self.inputs) 
-        info = info + "age =" + str(self.age) 
-        info = info + "Cell health ------>" + str(self.HP) + "\n"
+        info = ''
+        info = 'look' + str(self.appearance) + 'sight' + str(self.inputs) + 'outputs' + str(int(self.neuron.axon.telodendrites[0])) 
+        #info = info + "age =" + str(self.age) 
+        info = info + 'Cell health ' + str(self.HP) #+ "\n"
         #info = info + "cell memories ---" + (str(self.neuron.memories[0][self.neuron.circadianClock - 1])) + (str(self.neuron.memories[1][self.neuron.circadianClock - 1]))
         #info = info + "Cell DNA --------->" + str(self.DNA) + "\n"
         #info = info + "Cell location ---->" + str(self.x) + "," + str(self.y) + "\n"

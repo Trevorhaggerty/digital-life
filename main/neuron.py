@@ -3,10 +3,10 @@ import math
 
 
 def sigmoid(x) :
-    return 1 / (1 + math.exp((x)))
+    return 2 / (1 + math.exp(-x)) - 1 #2/(1+e^{-x})\ -1
 
 def Dsigmoid(x) :
-    return sigmoid(x) * sigmoid(1 - x)
+    return (2 * math.exp(x)) / pow((math.exp(x) + 1), 2)                                  #sigmoid(x) * sigmoid(1 - x)        #(2*e^x)/(e^x+1)^2
 
 class synapse :
     counter = 1
@@ -28,13 +28,13 @@ class dendrite :  #input and backflow handlers
     def __init__(self, DNA) :
         self.DNA = DNA 
         self.dendriticTree = [0] 
-        self.synapticWeight = [random.random()]
+        self.synapticWeight = [random.random() * 2 - 1]
         self.backFlowing = False
 
 class axon :  #output and backflow activation handlers
     def __init__(self, DNA) :
         self.DNA = DNA
-        self.HillockBias = random.random() # random initial bias
+        self.HillockBias = random.random() * 2 - 1 # random initial bias
         self.telodendrites = [0]
         self.feedingForward = False
 
@@ -56,7 +56,7 @@ class neuron : #will hopefully be the building block for a neural network
         counter = 0
         
         while len(self.dendrite.dendriticTree) > len(self.dendrite.synapticWeight) :
-                self.dendrite.synapticWeight.append(random.random())
+                self.dendrite.synapticWeight.append(random.random() * 2 - 1)
 
         #sum of the imputs signals multiplied by the corresponding weights
         for currentBranch in self.dendrite.dendriticTree : 
@@ -147,10 +147,10 @@ class neuron : #will hopefully be the building block for a neural network
         
         
         if len(self.soma.inputMemory) > self.soma.attentionSpan :
-            if all(self.soma.inputMemory):# and (int((self.soma.signalMemory[-1]) * 1000) == int((sum(self.soma.signalMemory) / len(self.soma.signalMemory) * 1000 ) ) ):
+            if all(self.soma.inputMemory) and (int((self.soma.signalMemory[-1]) * 1000) == int((sum(self.soma.signalMemory) / len(self.soma.signalMemory) * 1000 ) ) ):
                 for i in range(len(self.dendrite.synapticWeight)) :
-                    self.dendrite.synapticWeight[i] = random.random()
-                self.axon.HillockBias = random.random()
+                    self.dendrite.synapticWeight[i] = random.random() * 2 - 1
+                self.axon.HillockBias = random.random() * 2 - 1
 
             self.soma.inputMemory = [self.soma.inputMemory[-1]]
 

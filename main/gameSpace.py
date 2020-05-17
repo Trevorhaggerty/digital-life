@@ -9,6 +9,8 @@ def colorize(text,forground, background):
 
 def printGameSpace(gameSpace, entityList, xrange, yrange) :
     print(colorize('',2,0))
+    infoString = ''
+    infoCount = 0
     for y in range(yrange) :
         for x in range(xrange) :
             if y == 0 and x == 0:
@@ -23,13 +25,17 @@ def printGameSpace(gameSpace, entityList, xrange, yrange) :
 
                     print (colorize(z.appearance[0],z.appearance[1],z.appearance[2]), end = "")
                     print (colorize('',2,0), end = "")
-
-
+                    infoString += z.info()
+                    infoCount += 1
                     a = True
                     break
             if a == False :
                 print (gameSpace[x][y], end = "")
-        print ("|")
+        print ("|" , end = "")
+        print (str(infoString), end = "")
+        infoCount = 0
+        infoString = ''
+        print ('')
         if (y == yrange-1 and x == xrange-1):
             print ("|" + "__" * xrange + "|")
 
