@@ -10,14 +10,13 @@ from cell import *
 
 #imports from python libraries-----------------
 import datetime
-
 from os import system, name 
 from time import *
 import random
 
 #global variables------------------------------
-gameRange = [40, 40 ]
-gameSpace = [["  " for x in range(gameRange[1])] for x in range(gameRange[0]) ]
+gameRange = [40, 40]
+gameSpace = [ ["  " for x in range(gameRange[1]) ] for x in range(gameRange[0]) ]
 refreshSum = []
 gameTick = 0
 entityList = []
@@ -29,10 +28,10 @@ def clearScreen():
 	else: 
 		_ = system('clear') 
 #main Pre loop-----------------------------------
-userInputForGameTimeLim = input ("Enter how long to run the program in Ticks: ")
-gameTimeLimit = int(userInputForGameTimeLim)
+userInputForGameTimeLim = int(input ("Enter how long to run the program in Ticks: "))
+gameTimeLimit = userInputForGameTimeLim
 
-basicDNA = [1, .0001 , 200, "㋺", 2, 6]
+basicDNA = [1, .001 , 20, "㋺", 2, 6]
 
 cell1 = cell(basicDNA, random.randint(0,gameRange[0]-1), random.randint(0,gameRange[1]), len(entityList))
 cell1.mutate()
@@ -53,12 +52,12 @@ while end == False and gameTick <= gameTimeLimit:
 
     clearScreen()
 
-    printGameSpace(gameSpace, entityList,gameRange[0], gameRange[1])
     for i in range(len(entityList)):
         entityList[i].update(gameSpace, entityList)
         #print(entityList[i].info())
     
 
+    printGameSpace(gameSpace, entityList,gameRange[0], gameRange[1])
     gameTick += 1
     gameTimeRunning = (datetime.datetime.now() - gameStartTime).total_seconds()
     refreshElement = (datetime.datetime.now() - lastFrame).total_seconds()

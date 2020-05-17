@@ -8,7 +8,7 @@ class emptySlot:
         self.ID = ID
         self.x = -128
         self.y = -128
-        self.entityType = 0
+        self.entityType = 0 
     def update(self, a, b) :
         return 1 
     def info(self) :
@@ -27,7 +27,7 @@ class foodPellet :
         self.updateCount = 0
     def update(self, gameSpace, entitylist) :
         self.updateCount +=1
-        if self.drift == True and self.updateCount % random.randint(1,10) == random.randint(1,10):
+        if self.drift == True and 1 == random.randint(1,10):
             direction = random.randint(0,4)
             if direction == 1 and self.y > 0:
                 self.y -= 1
@@ -37,7 +37,6 @@ class foodPellet :
                 self.y += 1
             if direction == 4 and self.x > 0:
                 self.x -= 1
-
         return 1 
     def info(self) :
         info = ""
@@ -70,7 +69,7 @@ class cell:
 
     def perception(self, gameSpace, entitylist) :
         
-        #look north fill the first spot with -1 for nothing, 0 and up that say the distance north
+        
         if self.y > 0:
             for x in range((len(gameSpace))):
                 for y in range(self.y) :
@@ -222,3 +221,5 @@ class cell:
 #DNA = [] # list of basePairs
 
 #TTAGGG
+#AATCCC
+#

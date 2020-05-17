@@ -41,7 +41,7 @@ class axon :  #output and backflow activation handlers
 class neuron : #will hopefully be the building block for a neural network
     def __init__(self, DNA, x, y, ID) :
         self.DNA = DNA
-        random.seed(self.DNA[0])
+        #random.seed(self.DNA[0])
         self.appearance = self.DNA[3]
         self.ID = ID
         self.x = x
