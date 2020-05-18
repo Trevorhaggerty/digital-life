@@ -3,8 +3,12 @@ import math
 
 
 def sigmoid(x) :
-    return 2 / (1 + math.exp(-x)) - 1 #2/(1+e^{-x})\ -1
-
+    result = 0
+    try :
+        return 2 / (1 + math.exp(-x)) - 1 #2/(1+e^{-x})\ -1
+    except ArithmeticError as whatever :
+        print(whatever) 
+    return result        
 def Dsigmoid(x) :
     result = 0
     try :
@@ -27,7 +31,7 @@ class soma :    #handles bias and 'memory' of activation, and eventually HP/ATP(
         self.backFlowInputMemory = [[0],]
         self.backFlowSignalMemory = [0]
         self.costMemory = [0]
-        self.attentionSpan = 8
+        self.attentionSpan = 20
 
 class dendrite :  #input and backflow handlers
     def __init__(self, DNA) :
