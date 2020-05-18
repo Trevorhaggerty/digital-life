@@ -1,3 +1,4 @@
+from gameSpace import colorize
 import datetime
 import random
 import math
@@ -215,10 +216,10 @@ class cell:
 
 
     def info(self) :
-        info = ''
-        info = 'look' + str(self.appearance) + 'sight' + str(self.inputs) + 'outputs' + str(int(self.neuron.axon.telodendrites[0])) 
+        info = colorize(self.appearance[0],self.appearance[1],self.appearance[2])
+        #info = 'look' + str(self.appearance) + 'sight' + str(self.inputs) + 'outputs' + str(int(self.neuron.axon.telodendrites[0])) 
         #info = info + "age =" + str(self.age) 
-        info = info + 'Cell health ' + str(self.HP) #+ "\n"
+        info = info + 'HP' + str(self.HP) #+ "\n"
         #info = info + "cell memories ---" + (str(self.neuron.memories[0][self.neuron.circadianClock - 1])) + (str(self.neuron.memories[1][self.neuron.circadianClock - 1]))
         #info = info + "Cell DNA --------->" + str(self.DNA) + "\n"
         #info = info + "Cell location ---->" + str(self.x) + "," + str(self.y) + "\n"

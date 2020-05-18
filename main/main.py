@@ -30,7 +30,7 @@ def clearScreen():
 userInputForGameTimeLim = input ("Enter how long to run the program in Ticks: ")
 gameTimeLimit = int(userInputForGameTimeLim)
 
-basicDNA = [1, .001 , 200, "㋺", 2, 6]
+basicDNA = [1, .05 , 50, "㋺", 2, 6]
 
 cell(basicDNA, random.randint(0,gameRange[0]-1), random.randint(0,gameRange[1]-1), len(entityList))
 
@@ -53,19 +53,30 @@ lastFrame = datetime.datetime.now()
 
 
 while end == False and gameTick <= gameTimeLimit:
-    sleep(.5)
+    sleep(.005)
     clearScreen()
 
     for i in range(len(entityList)):
         entityList[i].update(gameSpace, entityList)
         #print(entityList[i].info())
     
+    for i in range(len(entityList)) :
+        if entityList[i].entityType == 1 :
+            for j in range(len(entityList)) :
+                if entityList[j].entityType == 2 and entityList[j].x == entityList[i].x and entityList[i].y == entityList[j].y :
+                     entityList[j].HP += 5
+                     entityList[i].x = random.randint(1, gameRange[0] - 1)
+                     entityList[i].y = random.randint(1, gameRange[1] - 1)
+
+
 
     printGameSpace(gameSpace, entityList,gameRange[0], gameRange[1])
     gameTick += 1
     gameTimeRunning = (datetime.datetime.now() - gameStartTime).total_seconds()
     refreshElement = (datetime.datetime.now() - lastFrame).total_seconds()
     refreshSum.append(refreshElement)
+
+
 
     #for i in range(len(entityList)):
     #    if entityList[i].entityType == 2 :
@@ -75,7 +86,7 @@ while end == False and gameTick <= gameTimeLimit:
     print('time since game began = ' + str(gameTimeRunning))
     print('game tick = ' + str(gameTick))
     lastFrame = datetime.datetime.now()
-    sleep(.5)
+    sleep(.005)
     
     #sleep(1)
     #valuedCustomerInput = input("enter to continue. type enter to end\n")

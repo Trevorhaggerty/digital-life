@@ -25,7 +25,7 @@ def printGameSpace(gameSpace, entityList, xrange, yrange) :
 
                     print (colorize(z.appearance[0],z.appearance[1],z.appearance[2]), end = "")
                     print (colorize('',2,0), end = "")
-                    #infoString += z.info()   <<<<<<<<-----------------------------------------------------------------------------
+                    infoString += z.info()  # <<<<<<<<-----------------------------------------------------------------------------
                     infoCount += 1
                     a = True
                     break
