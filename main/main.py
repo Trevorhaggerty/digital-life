@@ -3,7 +3,6 @@
 #
 #
 #local imports --------------------------------
-
 from neuron import *
 from gameSpace import *
 from cell import *
