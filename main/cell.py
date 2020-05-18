@@ -27,7 +27,7 @@ class foodPellet :
         self.updateCount = 0
     def update(self, gameSpace, entitylist) :
         self.updateCount +=1
-        if self.drift == True and 1 == random.randint(1,10):
+        if self.drift == True and 1 == random.randint(1,2):
             direction = random.randint(0,4)
             if direction == 1 and self.y > 0:
                 self.y -= 1
@@ -76,7 +76,7 @@ class cell:
                     for z in entitylist :
                         if z.x == x and z.y == y :
                             if z.entityType == 1 :
-                                self.inputs[0] = sigmoid((self.y - y))
+                                self.inputs[0] = (self.y - y)
         else :
             self.inputs[0] = -1
         
@@ -86,7 +86,7 @@ class cell:
                     for z in entitylist :
                         if z.x == x and z.y == y :
                             if z.entityType == 1 :
-                                self.inputs[1] = sigmoid((x - self.x))
+                                self.inputs[1] = (x - self.x)
         else :
             self.inputs[1] = -1
 
@@ -96,7 +96,7 @@ class cell:
                     for z in entitylist :
                         if z.x == x and z.y == y :
                             if z.entityType == 1 :
-                                self.inputs[2] = sigmoid((y - self.y))
+                                self.inputs[2] = (y - self.y)
         else :
             self.inputs[2] = -1
         if self.y > 0:
@@ -105,7 +105,7 @@ class cell:
                     for z in entitylist :
                         if z.x == x and z.y == y :
                             if z.entityType == 1 :
-                                self.inputs[3] = sigmoid((self.x - x))
+                                self.inputs[3] = (self.x - x)
         else :
             self.inputs[3] = -1
         retI = self.inputs
@@ -124,10 +124,13 @@ class cell:
         i = 0
         while i < len(self.DNA) :
             glitch = random.randint(-1,1)
-            if i != 3: 
+            if i != 3 and i != 1: 
                 self.DNA[i] += glitch
                 
             i += 1
+        glitch = random.randint(-1,1)
+        self.DNA[1] = self.DNA[1] + glitch/1000
+        glitch = random.randint(-1,1)
         self.DNA[3] = chr(ord(self.DNA[3]) + glitch)
         self.appearance = [self.DNA[3],self.DNA[4],self.DNA[5]]
 
@@ -164,7 +167,18 @@ class cell:
             self.neuron.update()
         elif self.neuron.dendrite.backFlowing == False and self.neuron.axon.feedingForward == True :
             #print(str(int(self.neuron.axon.telodendrites[0] * 4)))
-            self.cellMovement(gameSpace, int((round(self.neuron.axon.telodendrites[0]) + 1) * 2 ))
+
+
+            if self.neuron.axon.telodendrites[0] < 0 :
+                self.cellMovement(gameSpace, int((self.neuron.axon.telodendrites[0]) * 2) + 3)
+            elif self.neuron.axon.telodendrites[0] > 0 :
+                self.cellMovement(gameSpace, int((self.neuron.axon.telodendrites[0]) * 2) + 2)
+            elif self.neuron.axon.telodendrites[0] == 0 :
+                if self.neuron.soma.signalMemory[-1] < 0 :
+                    self.cellMovement(gameSpace, int((self.neuron.soma.signalMemory[-1]) * 2) + 3)
+                elif self.neuron.soma.signalMemory[-1] > 0 :
+                    self.cellMovement(gameSpace, int((self.neuron.soma.signalMemory[-1]) * 2) + 2)
+            
             self.neuron.axon.telodendrites[0] = 0
             self.neuron.update()
             #back propogate correct answer
@@ -191,6 +205,9 @@ class cell:
         self.homeostasis()
         if self.HP <= 0 :
             self.apoptosis(entitylist)
+        
+        if self.HP > 10 :
+            self.HP = 10
         if self.age >= self.DNA[2] and self.HP > 5 :
             self.mitosis(entitylist)
             

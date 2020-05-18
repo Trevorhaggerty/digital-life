@@ -6,7 +6,12 @@ def sigmoid(x) :
     return 2 / (1 + math.exp(-x)) - 1 #2/(1+e^{-x})\ -1
 
 def Dsigmoid(x) :
-    return (2 * math.exp(x)) / pow((math.exp(x) + 1), 2)                                  #sigmoid(x) * sigmoid(1 - x)        #(2*e^x)/(e^x+1)^2
+    result = 0
+    try :
+        result = (2 * math.exp(x)) / pow((math.exp(x) + 1), 2)
+    except ArithmeticError as whatever :
+        print(whatever) 
+    return result                                  #sigmoid(x) * sigmoid(1 - x)        #(2*e^x)/(e^x+1)^2
 
 class synapse :
     counter = 1
@@ -70,7 +75,7 @@ class neuron : #will hopefully be the building block for a neural network
         self.soma.signalBuildupMemory.append(signal)
         
         # sigmoid squishification resulting in a 
-        signal = sigmoid(signal)
+        signal = -sigmoid(signal)
         
         #remember what signal is being sent to the axon
         self.soma.signalMemory.append(signal)
@@ -206,10 +211,10 @@ class neuron : #will hopefully be the building block for a neural network
         dDetails = vars(self.dendrite)
         sDetails = vars(self.soma)
         aDetails = vars(self.axon)
-        outputString += '\nSTATE OF THE NEURON\n' + ('\n'.join("%s: %s" % element for element in nDetails.items())) + '\n'
-        outputString += '\nSTATE OF THE DENDRITE TREE\n' + ('\n'.join("%s: %s" % element for element in dDetails.items())) + '\n'
+        #outputString += '\nSTATE OF THE NEURON\n' + ('\n'.join("%s: %s" % element for element in nDetails.items())) + '\n'
+        #outputString += '\nSTATE OF THE DENDRITE TREE\n' + ('\n'.join("%s: %s" % element for element in dDetails.items())) + '\n'
         outputString += '\nSTATE OF THE SOMA\n' + ('\n'.join("%s: %s" % element for element in sDetails.items())) + '\n'
-        outputString += '\nSTATE OF THE TELODENDRITES\n' + ('\n'.join("%s: %s" % element for element in aDetails.items())) + '\n'
+        #outputString += '\nSTATE OF THE TELODENDRITES\n' + ('\n'.join("%s: %s" % element for element in aDetails.items())) + '\n'
         
         return outputString
 # stem cells to propogate and differentiate into neurons, maybe into the 4 different types for role division (maybe even glial cells?)

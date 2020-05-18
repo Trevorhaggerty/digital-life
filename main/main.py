@@ -15,7 +15,7 @@ from time import *
 import random
 
 #global variables------------------------------
-gameRange = [40, 40]
+gameRange = [20, 20]
 gameSpace = [ ["  " for x in range(gameRange[1]) ] for x in range(gameRange[0]) ]
 refreshSum = []
 gameTick = 0
@@ -28,18 +28,23 @@ def clearScreen():
 	else: 
 		_ = system('clear') 
 #main Pre loop-----------------------------------
-userInputForGameTimeLim = int(input ("Enter how long to run the program in Ticks: "))
-gameTimeLimit = userInputForGameTimeLim
+userInputForGameTimeLim = input ("Enter how long to run the program in Ticks: ")
+gameTimeLimit = int(userInputForGameTimeLim)
 
-basicDNA = [1, .001 , 20, "㋺", 2, 6]
+basicDNA = [1, .001 , 200, "㋺", 2, 6]
 
-cell1 = cell(basicDNA, random.randint(0,gameRange[0]-1), random.randint(0,gameRange[1]), len(entityList))
-cell1.mutate()
-entityList.append(cell1)
+cell(basicDNA, random.randint(0,gameRange[0]-1), random.randint(0,gameRange[1]-1), len(entityList))
+
+population = 0
+desiredPopulation = 5
+while population < desiredPopulation :
+    entityList.append( cell(basicDNA, random.randint(0,gameRange[0]-1), random.randint(0,gameRange[1]-1), len(entityList)) )
+    entityList[-1].mutate()
+    population = len(entityList)
 
 gameStartTime = datetime.datetime.now()
 
-entityList.append(foodPellet(0,0,5, len(entityList)))
+entityList.append(foodPellet(int(gameRange[0]/2),int(gameRange[1]/2),5, len(entityList)))
 
 
 #mainloop----------------------------------------
@@ -49,7 +54,7 @@ lastFrame = datetime.datetime.now()
 
 
 while end == False and gameTick <= gameTimeLimit:
-
+    sleep(.5)
     clearScreen()
 
     for i in range(len(entityList)):
@@ -62,11 +67,16 @@ while end == False and gameTick <= gameTimeLimit:
     gameTimeRunning = (datetime.datetime.now() - gameStartTime).total_seconds()
     refreshElement = (datetime.datetime.now() - lastFrame).total_seconds()
     refreshSum.append(refreshElement)
+
+    #for i in range(len(entityList)):
+    #    if entityList[i].entityType == 2 :
+    #        print(entityList[i].neuron.info())
+
     print('average tick time = ' + str(sum(refreshSum,0) / gameTick))
     print('time since game began = ' + str(gameTimeRunning))
     print('game tick = ' + str(gameTick))
     lastFrame = datetime.datetime.now()
-    sleep(.05)
+    sleep(.5)
     
     #sleep(1)
     #valuedCustomerInput = input("enter to continue. type enter to end\n")
