@@ -11,8 +11,22 @@ class entity :
         #fill the ID
         self.ID = ID
 
-#testing making subclasses of the entity class
-class itemEntity :
-    #idk looks cool though.
-    def __init_subclass__(cls,entity): #<----------RAD!!
-        return super().__init_subclass__()  #<----------lit breh breh
+#make a subclass of entity with the entity an Type of 'item'
+class itemEntity(entity) :
+    #this is the begining function for the subclass
+    def __init__(self, x , y , ID , entityType ): 
+        #take on the entity feature
+        super().__init__(x, y, ID)
+        #set the entities type item
+        self.entityType = 'item'
+
+#make the neuron
+class neuron(entity) :
+    #
+    def __init__(self, x , y , ID , entityType ):
+        #
+        super().__init__(x, y, ID)
+        #
+        self.entityType = 'neuron'
+
+#

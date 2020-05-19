@@ -7,7 +7,7 @@ class game :
     #when the class is created it calls this function first
     def __init__(self):
         #create a logger and tell it what version to display
-        self.logger = eventLog('0')
+        self.logger = eventLog('digital life', '0')
         #tell the logger to be active (???this is temporary???)
         self.logger.logging = True
         #create the end condition bool and set it to false
@@ -30,7 +30,7 @@ class game :
         #return 1 because its better than 2
         return 1
 
-    #the game falls post pregame and preend run-ny 
+    #the game falls post pregame and pre-end 
     def gameLoop(self):
         
         #log it!!!

@@ -9,8 +9,11 @@ import datetime
 class eventLog : 
 
     #when the eventlog is created this is called immediately
-    def __init__(self, programVersion) :
+    def __init__(self, programName, programVersion) :
 
+        #holds the name of the program
+        self.programName = programName
+        #holds the version number
         self.programVersion = " v" + str(programVersion)
         #holds the strings for the names of columns that the log will display
         self.logColumns = "   DATE   |   TIME   |  EVENT  |  LOG ITEM"  
@@ -23,6 +26,20 @@ class eventLog :
         #log the new session
         self.logEvent('Begin log')
     
+    def centerString(self, inputString, spaceSize, spaceCharacter):
+        bufferString = inputString
+        #while the string is less than 7 characters long in total
+        while len(bufferString) < spaceSize :
+            #if the length of the string is odd
+            if len(bufferString)%2 == 1 :
+                #add a space on the left moving the number right
+                bufferString = spaceCharacter + bufferString 
+                #if the length of the string is even
+            else :
+                #add a space on the right moving the number left
+                bufferString = bufferString + spaceCharacter
+        return bufferString
+
     #call this function when the log is closed. displays the columns names
     def endLog(self):
         if self.logging :
@@ -43,21 +60,11 @@ class eventLog :
             self.logCounter +=1
 
 
-#------------------Potentially its own function?------------------------#
+
             #make a string to hold the log count
             logCounterString = str(self.logCounter)  
-    #--------------centering a string in a bounds of 7-----------
-            #while the string is less than 7 characters long in total
-            while len(logCounterString) < 7 :
-                #if the length of the string is odd
-                if len(logCounterString)%2 == 1 :
-                    #add a space on the left moving the number right
-                    logCounterString = " " + logCounterString 
-                    #if the length of the string is even
-                else :
-                    #add a space on the right moving the number left
-                    logCounterString = logCounterString + " "
-#-----------------------------------------------------------------------#
+
+            self.centerString(logCounterString,7," ")
 
             #update the log date to the current date and time
             self.logDate = datetime.datetime.now()
@@ -73,11 +80,11 @@ class eventLog :
             return 0
 	
     def splashScreen(self):
-        splash = '|' + ('=' * 46 ) + '|\n'
-        splash += '|digital-life' + self.programVersion + (' ' * 30) + ' |\n'	 
-        splash += '|coded by                                      |\n'
-        splash += '|    Trevor Haggerty  - cesismalon@gmail.com   |\n'
-        splash += '|    Zachary Drummond - zdrummon@gmail.com     |\n'
-        splash += '|' + ('=' * 46 ) + '|\n'
+        splash = '@' + ('=' * 46 ) + '@\n'
+        splash += '@@' + (self.centerString(self.programName + self.programVersion, 44 ,"_")) + '@@\n'
+        splash += '| ' + self.centerString('coded by', 44 ," ") + ' |\n'
+        splash += '| ' + self.centerString('Trevor Haggerty  - cesismalon@gmail.com', 44 ," ") + ' |\n'
+        splash += '| ' + self.centerString('Zachary Drummond - zdrummon@gmail.com', 44 ," ") + ' |\n'
+        splash += '@' + ('=' * 46 ) + '@\n'
         print (splash)
         
