@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 #Digital-life
 ####coded by                 
+=======
+#coded by                 
+>>>>>>> trevor
 ##Trevor Haggerty - cesismalon@gmail.com 
 ##Zachary Drummond - zdrummon@gmail.com  
 ========================================
