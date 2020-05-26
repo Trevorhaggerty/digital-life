@@ -1,8 +1,10 @@
+
+
 #Imports---------------------------------------------------------
 import numpy as np
 import random
 from eventLog import *
-
+from graphHandler import *
 #Global-Variable-Initialization-----------------------------------
 #  name of program, version Number, priorityBias 
 logger = eventLog('staticNeuralNet','0', 1) 
@@ -10,15 +12,25 @@ logger = eventLog('staticNeuralNet','0', 1)
 
 
 np.random.seed(seed = 1)
-
+learningRate = .1
 
 #training data --------------------------------------------------
-    #the first three in each list are the inputs, the last is the answer
-    #training to be an XNOR gate
-trainingData = [[0,0,0],
-                [0,1,1],
-                [1,0,1],
-                [1,1,1],]
+    #the last element in each group is the answer
+    #
+trainingData = [[0, 1],
+                [1, 0],
+                [2, 1],
+                [3, 0],
+                [4, 1],
+                [5, 0],
+                [6, 1],
+                [7, 0],
+                [8, 1],
+                [9, 0],
+                [10,1],
+                
+                
+                ]
 
 
 
@@ -103,7 +115,7 @@ class node:
 
         if self.mode == 0 : # if this is an input node the 
             for w in range(len(self.weights)-1) :
-                self.weights[w] -= 2 * self.lastInput[w] * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
+                self.weights[w] -=  self.lastInput[w] * learningRate * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
 
         elif self.mode == 1 :
             logger.logEvent('weights : ' + str(self.weights),5)
@@ -111,16 +123,16 @@ class node:
             logger.logEvent('self.numberOfInputs - 1 : ' + str(self.numberOfInputs - 1),5)
             
             for w in range(len(self.weights)-1) :
-                self.inputArray[w] -= self.weights[w] * 2 * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
+                self.inputArray[w] -= self.weights[w]  * learningRate * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
                 
                 logger.logEvent('self.inputArray[w]' + str(self.inputArray[w]),4)
                 
-                self.weights[w] -= self.lastInput[w] * 2 * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
+                self.weights[w] -= self.lastInput[w]  * learningRate * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
                 
                 logger.logEvent('self.weights[w]' + str(self.weights[w]),4)
               
 
-        self.bias -= 2 * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
+        self.bias -=  learningRate * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
         self.backPropagationSignal = 0
 
 
@@ -128,15 +140,15 @@ def main():
 
     costList = []
     cost = 0
-    node1 = node(0, 2)
-    node2 = node(0, 2)
+    node1 = node(0, 1)
+    node2 = node(0, 1)
     node3 = node(1, 2)
-    sessions = 0
-    while sessions < 10000:
+    epoch = 0
+    while epoch < 1000:
         currentTrainingDataList = []
-        
+    
         for l in range(len(trainingData[0])):
-            currentTrainingDataList.append(trainingData[sessions % (len(trainingData))][l])
+            currentTrainingDataList.append(trainingData[random.randint(0,10000) % (len(trainingData))][l])
         
         rightAnswer = currentTrainingDataList.pop()
 
@@ -165,9 +177,10 @@ def main():
         logger.logEvent('node3 output:  ' + str((node3.outputSignal)),1)
 
         costList.append(pow(node3.outputSignal - rightAnswer, 2))
+        logger.logEvent('current cost: ' + str(pow(node3.outputSignal - rightAnswer, 2)),1)
         if len(costList) > 1 :
             cost = sum(costList)/len(costList)
-            logger.logEvent('cost: ' + str(cost),1)
+            logger.logEvent('cost: ' + str(cost),2)
 
         node3.backPropagationSignal = rightAnswer
         node3.backPropagation()
@@ -179,10 +192,12 @@ def main():
         node2.backPropagationSignal = node3.inputArray[1]
         node2.backPropagation()
 
-        logger.logEvent('sessions: ' + str (sessions),1)
+        logger.logEvent('epoch: ' + str (epoch),1)
 
-        sessions += 1
-    
+        epoch += 1
+        
+    logger.logEvent('cost: ' + str(cost),1)
+
 main    ()
 
         
