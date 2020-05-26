@@ -1,13 +1,31 @@
 #Imports---------------------------------------------------------
-
 import numpy as np
 import random
 from eventLog import *
 
 #Global-Variable-Initialization-----------------------------------
+#  name of program, version Number, priorityBias 
+logger = eventLog('staticNeuralNet','0', 1) 
+#logger copy paste template:    logger.logEvent('' + str(),10)
 
-logger = eventLog('staticNeuralNet','0')
-random.seed(5)
+
+np.random.seed(seed = 1)
+
+
+#training data --------------------------------------------------
+    #the first three in each list are the inputs, the last is the answer
+    #training to be an XNOR gate
+trainingData = [[0,0,0],
+                [0,1,1],
+                [1,0,1],
+                [1,1,1],]
+
+
+
+
+
+
+
 
 #Activation Functions --------------------------------------------
     #Sigmoid and its derivative-----------------------------------
@@ -47,31 +65,35 @@ def softplus(x) :
 
 class node:
     def __init__(self, mode, numberOfInputs):
-
         self.mode = mode
-        self.inputArray = []
+        logger.logEvent('mode:' + str(self.mode),7)
+        self.inputArray = np.array([])
         self.flowingDirection = 0 # -1 for backflowing, 0 for nothing, 1 for forward flowing
-        self.lastInput = []
-        
-        self.weights = []
-        for i in range(numberOfInputs):
-            self.weights.append(random.random())    
+        self.lastInput = np.array([])
+        self.numberOfInputs = numberOfInputs
+ 
+        self.weights =  np.random.rand(self.numberOfInputs)
         self.bias = random.random()
 
-        self.lastOutput = 0
+        self.lastOutput = np.array([])
         self.preActivationSignal = 0
         self.outputSignal = 0
         self.backPropagationSignal = 0
 
-        logger.logEvent('node created')
+        logger.logEvent('node created with weights :' + str(self.weights),5)
 
     def feedForward(self):
         self.flowingDirection = 1
-        self.preActivationSignal = np.dot(self.inputArray,self.weights) + self.bias
+        #self.preActivationSignal = np.dot(self.inputArray, self.weights) + self.bias
+        buildup = 0
+        for i in range(self.numberOfInputs - 1):
+            buildup = self.inputArray[i] * self.weights[i]
+        self.preActivationSignal = buildup + self.bias
+        
+        
         self.outputSignal = softplus(self.preActivationSignal)
-        self.lastInput = self.inputArray
-        for i in range(len(self.inputArray)):
-            self.inputArray[i] = 0
+        self.lastInput = self.inputArray.copy()
+        self.inputArray = np.zeros(shape=(self.numberOfInputs))
         self.lastOutput = self.outputSignal
         return 1
 
@@ -80,13 +102,23 @@ class node:
         self.flowingDirection = -1
 
         if self.mode == 0 : # if this is an input node the 
-            for w in range(len(self.weights)) :
+            for w in range(len(self.weights)-1) :
                 self.weights[w] -= 2 * self.lastInput[w] * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
 
         elif self.mode == 1 :
-            for w in range(len(self.weights)) :
-                self.inputArray[w] = 2 * self.lastInput[w] * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
-                self.weights[w] += 2 * self.lastInput[w] * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
+            logger.logEvent('weights : ' + str(self.weights),5)
+            logger.logEvent('input array : ' + str(self.lastInput),5)
+            logger.logEvent('self.numberOfInputs - 1 : ' + str(self.numberOfInputs - 1),5)
+            
+            for w in range(len(self.weights)-1) :
+                self.inputArray[w] -= self.weights[w] * 2 * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
+                
+                logger.logEvent('self.inputArray[w]' + str(self.inputArray[w]),4)
+                
+                self.weights[w] -= self.lastInput[w] * 2 * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
+                
+                logger.logEvent('self.weights[w]' + str(self.weights[w]),4)
+              
 
         self.bias -= 2 * sigmoid(self.preActivationSignal) * (self.lastOutput - self.backPropagationSignal)
         self.backPropagationSignal = 0
@@ -94,19 +126,63 @@ class node:
 
 def main():
 
-    rightAnswer = random.randint(-1,3)
-
-    node1 = node(0, 4)
+    costList = []
+    cost = 0
+    node1 = node(0, 2)
+    node2 = node(0, 2)
+    node3 = node(1, 2)
     sessions = 0
-    while sessions < 50:
-        node1.inputArray = [1,0.1,0.5,0.3]
+    while sessions < 10000:
+        currentTrainingDataList = []
+        
+        for l in range(len(trainingData[0])):
+            currentTrainingDataList.append(trainingData[sessions % (len(trainingData))][l])
+        
+        rightAnswer = currentTrainingDataList.pop()
+
+        currentTrainingData = np.array(currentTrainingDataList)
+
+        logger.logEvent('right answer: ' + str(rightAnswer),1)
+  
+       #logger.logEvent('currentTrainingData: ' + str(currentTrainingData))
+ 
+        node1.inputArray = np.array(currentTrainingData)
+        node2.inputArray = np.array(currentTrainingData)
+
+
         node1.feedForward()
-        logger.logEvent('node output: ' + str(node1.outputSignal))
-        cost = pow(node1.outputSignal - rightAnswer, 2)
-        node1.backPropagationSignal = rightAnswer
+        logger.logEvent('feeding forward for the first node',5)
+        logger.logEvent('node1 output: ' + str(node1.outputSignal),5)
+        node2.feedForward()
+        logger.logEvent('feeding forward for the second node',5)
+        logger.logEvent('node2 output: ' + str(node2.outputSignal),5)
+        
+        bufferList = [float(node1.outputSignal), float(node2.outputSignal)]
+        node3.inputArray = np.array(bufferList)
+
+        node3.feedForward()
+        logger.logEvent('feeding forward for the third node',5)
+        logger.logEvent('node3 output:  ' + str((node3.outputSignal)),1)
+
+        costList.append(pow(node3.outputSignal - rightAnswer, 2))
+        if len(costList) > 1 :
+            cost = sum(costList)/len(costList)
+            logger.logEvent('cost: ' + str(cost),1)
+
+        node3.backPropagationSignal = rightAnswer
+        node3.backPropagation()
+        logger.logEvent('node backprop message to previous cell ' + str (node3.inputArray),5)
+        
+        node1.backPropagationSignal = node3.inputArray[0]
         node1.backPropagation()
-        logger.logEvent('node backprop message to previous cell ' + str (node1.inputArray))
-        logger.logEvent('sessions: ' + str (sessions))
+
+        node2.backPropagationSignal = node3.inputArray[1]
+        node2.backPropagation()
+
+        logger.logEvent('sessions: ' + str (sessions),1)
+
         sessions += 1
     
 main    ()
+
+        
