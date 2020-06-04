@@ -4,7 +4,9 @@ from gameSpace import *
 from entities import *
 
 random.seed(420)
-
+#--------------------------------------------------------------------------------------------------------------
+def distance(x1, y1, x2, y2):
+    return (abs((x1 - (y1 + (y1&1)) / 2) - (x2 - (y2 + (y2&1)) / 2)) + abs((-(x1 - (y1 + (y1&1)) / 2) - y1) - (-(x2 - (y2 + (y2&1)) / 2) - y2) ) + abs((y1) - (y2))) / 2
 #-------------------------------------------------------------------------------------------------------------
 def checkNeighbor(x, y, target, gameSpace) :
     counter = [0,0,0,0,0,0]
@@ -136,8 +138,8 @@ def createTerrain(xMax, yMax, seed, water):
     fillSwap(1, 2, gs)
     fillBoarder(2, gs)
     fillEdges(0, 2 , 1 , gs)
-    gs.entityList.append(playerEntity(25,10))
-    gs.entityList.append(monsterEntity(5,10))
+    gs.entityList.append(playerEntity(random.randint(3, xMax - 3), random.randint(3, yMax - 3)))
+    gs.entityList.append(monsterEntity(random.randint(3, xMax - 3), random.randint(3, yMax - 3)))
     for i in gs.entityList:
         fillLandingZone(i.x , i.y , 0, gs)
         for j in gs.entityList:

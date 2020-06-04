@@ -4,9 +4,13 @@ from terrainGenerator import *
 def requestMovementInput():
     requestFiled = False
     while requestFiled == False :
-        print("1  ↖ /\ ↗ 2")
-        print("6  ⬅| |➡ 3")
-        print("5  ↙ \/ ↘ 4")
+        print("1               2")
+        print("     ↖ / \ ↗   ")
+        print("      /   \ ")
+        print("6  ⬅ |     |➡  3")
+        print("      \   / ")
+        print("     ↙ \ / ↘    ")
+        print("5               4")
         valuedCustomerInput = input("enter to continue. type 0 to end\n")
         try :
             direction = int(valuedCustomerInput) -1

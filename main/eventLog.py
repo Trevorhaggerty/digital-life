@@ -9,7 +9,7 @@ import datetime
 class eventLog : 
 
     #when the eventlog is created this is called immediately
-    def __init__(self, programName, programVersion, priorityBias = 0) :
+    def __init__(self, programName, programVersion, priorityBias = 0, logging = True) :
 
         #holds the name of the program
         self.programName = programName
@@ -24,7 +24,7 @@ class eventLog :
         #holds the date and time of each log
         self.logDate = datetime.datetime.now()
         #bool for determining if the log will be made
-        self.logging = bool
+        self.logging = logging
         #log the new session
         self.logEvent('Begin log',1)
     
