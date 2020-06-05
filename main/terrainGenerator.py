@@ -1,47 +1,10 @@
 
 import random
 from gameSpace import *
+
+from hexTools import *
 from entities import *
-
 random.seed(420)
-#--------------------------------------------------------------------------------------------------------------
-def distance(x1, y1, x2, y2):
-    return (abs((x1 - (y1 + (y1&1)) / 2) - (x2 - (y2 + (y2&1)) / 2)) + abs((-(x1 - (y1 + (y1&1)) / 2) - y1) - (-(x2 - (y2 + (y2&1)) / 2) - y2) ) + abs((y1) - (y2))) / 2
-#-------------------------------------------------------------------------------------------------------------
-def checkNeighbor(x, y, target, gameSpace) :
-    counter = [0,0,0,0,0,0]
-    if (y % 2 != 0 and x < gameSpace.xMax - 1 and y < gameSpace.yMax - 1 and x > 0 and y > 0):
-    	if (gameSpace.terrainData[x - 1][y - 1] == target) :
-            counter[0]+= 1
-    	if (gameSpace.terrainData[x - 0][y - 1] == target) :
-            counter[1]+= 1
-    	if (gameSpace.terrainData[x + 1][y + 0] == target) :
-            counter[2]+= 1
-    	if (gameSpace.terrainData[x + 0][y + 1] == target) :
-            counter[3]+= 1
-    	if (gameSpace.terrainData[x - 1][y + 1] == target) :
-            counter[4]+= 1
-    	if (gameSpace.terrainData[x - 1][y + 0] == target) :
-            counter[5]+= 1
-
-    elif (y % 2 == 0 and x < gameSpace.xMax - 1 and y < gameSpace.yMax - 1 and x > 0 and y > 0) :
-    	if (gameSpace.terrainData[x + 0][y - 1] == target) : 
-            counter[0]+=1 
-    	if (gameSpace.terrainData[x + 1][y - 1] == target) : 
-            counter[1]+=1
-    	if (gameSpace.terrainData[x + 1][y + 0] == target) : 
-            counter[2]+=1
-    	if (gameSpace.terrainData[x + 1][y + 1] == target) : 
-            counter[3]+=1
-    	if (gameSpace.terrainData[x + 0][y + 1] == target) : 
-            counter[4]+=1
-    	if (gameSpace.terrainData[x - 1][y + 0] == target) : 
-            counter[5]+=1
-
-    return counter
-#---------------------------------------------------------------------------------------
-def tileTypeCount(tileType, gameSpace):
-    return gameSpace.terrainData.count(tileType)
 
 #----------------------------------------------------------------------------------------
 def fillLandingZone(x, y, spread, gameSpace):
@@ -106,10 +69,10 @@ def fillEdges(target, secondTarget, spread, gameSpace):
     return 0
 #---------------------------------------------------------------------------
 def fillBoarder(spread, gameSpace):
-    for i in range(gameSpace.xMax - 1):
+    for i in range(gameSpace.xMax):
         gameSpace.terrainData[i][0] = spread
         gameSpace.terrainData[i][gameSpace.yMax - 1] = spread
-    for i in range(gameSpace.yMax - 1):
+    for i in range(gameSpace.yMax):
         gameSpace.terrainData[0][i] = spread
         gameSpace.terrainData[gameSpace.xMax - 1][i] = spread
     return 0
@@ -127,24 +90,26 @@ def fillBCurve(x1 , y1, x2, y2, spread, hallWidth, gameSpace):
 				and x <= int(((1 - (k)) * (1 - (k)) * (x1) + hallWidth * (1 - (k)) * (k) *	(x3 ) + (k) * (k) * (x2)))
 				and y <= int(((1 - (k)) * (1 - (k)) * (y1) + hallWidth * (1 - (k)) * (k) *	(y3 ) + (k) * (k) * (y2)))) :
                     gameSpace.terrainData[x][y] = spread
-        k += 0.001
+        k += 0.01
 
 def createTerrain(xMax, yMax, seed, water):
     gs = gameSpace(xMax, yMax)
     random.seed(seed)
-    fillScattered(1,48, gs)
-    fillGaps(0, 4, 1 , 1, gs)
-    fillGaps(1, 3, 0 , 0, gs)
-    fillSwap(1, 2, gs)
-    fillBoarder(2, gs)
-    fillEdges(0, 2 , 1 , gs)
+    #fillScattered(1,100, gs)
+    #fillGaps(0, 4, 1 , 1, gs)
+    #fillGaps(1, 3, 0 , 0, gs)
+    #fillSwap(1, 2, gs)
+    #fillBoarder(2, gs)
+    #fillEdges(0, 2 , 1 , gs)
     gs.entityList.append(playerEntity(random.randint(3, xMax - 3), random.randint(3, yMax - 3)))
-    gs.entityList.append(monsterEntity(random.randint(3, xMax - 3), random.randint(3, yMax - 3)))
-    for i in gs.entityList:
-        fillLandingZone(i.x , i.y , 0, gs)
-        for j in gs.entityList:
-            fillBCurve(i.x, i.y, j.x, j.y, 0, 1, gs)
-    fillSwap(1, 0, gs)
-    fillBoarder(2, gs)
-    fillEdges(2, 0 , 1 , gs)
+    gs.entityList.append(monsterEntity(int(xMax/2), int(yMax/2)))
+
+    fillBoarder(1, gs)
+    #fillEdges(2, 0 , 1 , gs)
+    #fillSwap(2, 1, gs)
+    #for i in gs.entityList:
+    #    fillLandingZone(i.x , i.y , 0, gs)
+    #    for j in gs.entityList:
+    #        fillBCurve(i.x, i.y, j.x, j.y, 0, .5, gs)
+    
     return gs

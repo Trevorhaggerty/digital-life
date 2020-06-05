@@ -1,4 +1,4 @@
-from terrainGenerator import * 
+
 
 
 def requestMovementInput():
@@ -20,46 +20,3 @@ def requestMovementInput():
             print('please try again')
     return direction
 
-def moveEntity(entityID, direction, gameSpace):
-    if checkNeighbor(gameSpace.entityList[entityID].x, gameSpace.entityList[entityID].y, 0, gameSpace)[direction] == 1:
-        if gameSpace.entityList[entityID].y % 2 != 0:
-            if direction == 0:
-                gameSpace.entityList[entityID].x -= 1
-                gameSpace.entityList[entityID].y -= 1
-            if direction == 1:
-                gameSpace.entityList[entityID].x += 0 
-                gameSpace.entityList[entityID].y -= 1
-            if direction == 2:
-                gameSpace.entityList[entityID].x += 1
-                gameSpace.entityList[entityID].y += 0
-            if direction == 3:
-                gameSpace.entityList[entityID].x += 0
-                gameSpace.entityList[entityID].y += 1
-            if direction == 4:
-                gameSpace.entityList[entityID].x -= 1
-                gameSpace.entityList[entityID].y += 1
-            if direction == 5:
-                gameSpace.entityList[entityID].x -= 1
-                gameSpace.entityList[entityID].y += 0
-        elif gameSpace.entityList[entityID].y % 2 == 0:
-            if direction == 0:
-                gameSpace.entityList[entityID].x += 0
-                gameSpace.entityList[entityID].y -= 1
-            if direction == 1:
-                gameSpace.entityList[entityID].x += 1
-                gameSpace.entityList[entityID].y -= 1
-            if direction == 2:
-                gameSpace.entityList[entityID].x += 1
-                gameSpace.entityList[entityID].y += 0
-            if direction == 3:
-                gameSpace.entityList[entityID].x += 1
-                gameSpace.entityList[entityID].y += 1
-            if direction == 4:
-                gameSpace.entityList[entityID].x += 0
-                gameSpace.entityList[entityID].y += 1
-            if direction == 5:
-                gameSpace.entityList[entityID].x -= 1
-                gameSpace.entityList[entityID].y += 0
-    else:
-        print('the way is blocked')
-    return False
