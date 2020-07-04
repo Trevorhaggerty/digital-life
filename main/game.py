@@ -1,11 +1,7 @@
-# a conversion of a very early working prototype of goblinTentacles,
-# mainly the functionality of 0.3 and the level generation of 0.5-0.7
 
 #libraries
-import datetime
 import numpy as np
 import sys
-from os import system, name 
 import random
 
 #local import
@@ -17,31 +13,25 @@ from hexTools import *
 from terrainGenerator import *
 
 
-
-#global stuff
-def clearScreen():
-    if name == 'nt': 
-	    _ = system('cls')
-    else: 
-	    _ = system('clear') 
-
 logger = eventLog('Goblin Tentacles Python', '0.1', 5, True)
 gameSpace = createTerrain(20, 20, 2, False)
 logger.logEvent('terrain generated',5)
 
 
-
-
 def main():
-    gameOver = False
+    gameOver = False 
     gameTick = 0
+    
+
+
     while gameOver == False:
+        
         clearScreen()
         logger.logEvent('gameTick:' + str(gameTick) + '--------------------------------------------------------------------------------------',0)
         printGameSpace(gameSpace)
 
         
-        #_------------------------this will likely end up being a seperate file soon
+#-----------------------this will likely end up being a seperate file soon
 #--------------------------------------------------------------------------------------------------------------------------------------------
         for i in range(len(gameSpace.entityList)):
 #--------------------------------------------------------------------------------------------------------------------------------------------
@@ -131,13 +121,6 @@ def main():
                             gameSpace.entityList[i].monsterAI.backPropagation([0,0,0,1,0,0])
                             logger.logEvent('[0,0,0,1,0,0] is answer fed',0)
 #--------------------------------------------------------------------------------------------------------------------------------------------
-                
-
-
-
-
-
-
         gameTick += 1
         if gameTick > 1000:
             gameOver = True
@@ -152,5 +135,3 @@ def main():
     logger.logEvent('outputlayer:',0)
     for i in range(len(gameSpace.entityList[1].monsterAI.outputLayer)):
         logger.logEvent(str(gameSpace.entityList[1].monsterAI.outputLayer[i].weights),0)
-
-main()
