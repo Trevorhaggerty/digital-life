@@ -89,8 +89,8 @@ class nnode:
 
         logger.logEvent('inputArray' + str(self.inputArray),3)
         logger.logEvent('weights' + str(self.weights),3)
-
-        self.outputSignal = sigmoid(np.dot(self.inputArray, self.weights) )#+ self.bias)
+        print(str(self.inputArray) + '   ' + str(self.weights))
+        self.outputSignal = sigmoid(np.dot(self.inputArray, self.weights) + self.bias)
         self.lastInput = []
         for i in range(len(self.inputArray)):
             self.lastInput.append(self.inputArray[i])
@@ -149,7 +149,7 @@ class nnetwork:
             self.inputLayer[i].feedForward()
             logger.logEvent(str(i), 3)
             logger.logEvent(str(self.inputLayer[i].outputSignal), 3)
-            edgeBuffer.append(self.inputLayer[i].outputSignal)
+            edgeBuffer.append((self.inputLayer[i].outputSignal))
         npEdgeBuffer = np.array(edgeBuffer)
         logger.logEvent(str(edgeBuffer),3)
         edgeBuffer = []
