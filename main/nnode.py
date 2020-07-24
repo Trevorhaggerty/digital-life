@@ -4,57 +4,15 @@
 import numpy as np
 import random
 from eventLog import *
+from mathTools import *
 
 #Global-Variable-Initialization-----------------------------------
 #  name of program, version Number, priorityBias 
-logger = eventLog('staticNeuralNet','0.2', 2, False) 
+logger = eventLog('staticNeuralNet','0.3', 10, False) 
 #logger copy paste template:    logger.logEvent('' + str(),10)
 
-
+logger.priorityBias = 1
 np.random.seed(seed = 1)
-
-
-
-#Activation Functions --------------------------------------------
-    #Sigmoid and its derivative-----------------------------------
-def sigmoid(x):
-    try :
-        return 1 / (1 + np.exp(-x))
-    except ArithmeticError as errorcode :
-        logger.logEvent(errorcode)
-        return 0 
-
-def Dsigmoid(x) :
-    try :
-        return x * (1 - x)
-    except ArithmeticError as errorcode :
-        logger.logEvent(errorcode)
-        return 0
-    #reLu and its derivative--------------------------------------
-def reLu(x) :
-    if x < 0 :
-        return 0
-    else:
-        return x
-
-def DreLu(x) :
-    if x < 0 :
-        return 0
-    else:
-        return 1
-    #softplus (the derivative of the softplus is the sigmoid)-----
-def softplus(x) :
-    try :
-        return np.log(1 + np.exp(x)) - 1
-    except ArithmeticError as errorcode :
-        logger.logEvent(errorcode)
-        return 0
-
-def tanh(x) :
-    return np.tanh(x)
-
-def Dtanh(x): 
-        return 1.0 - tanh(x) ** 2
 
 class nnode:
     def __init__(self, mode, learningRate, numberOfInputs):
@@ -89,7 +47,7 @@ class nnode:
 
         logger.logEvent('inputArray' + str(self.inputArray),3)
         logger.logEvent('weights' + str(self.weights),3)
-        print(str(self.inputArray) + '   ' + str(self.weights))
+        #print(str(self.inputArray) + '   ' + str(self.weights))
         self.outputSignal = sigmoid(np.dot(self.inputArray, self.weights) + self.bias)
         self.lastInput = []
         for i in range(len(self.inputArray)):
@@ -110,12 +68,12 @@ class nnode:
            
             for w in range(len(self.weights)) :
                 
-                if (reLu(self.weights[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput))) > 0:
+                self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput)
+                if (self.weights[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput)) > 0:
                     self.inputArray[w] = 1
                 else:
                     self.inputArray[w] = 0
                 
-                self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput)
                 #logger.logEvent('self.weights[w]' + str(self.weights[w]),2)
             #self.bias +=  self.learningRate * Dsigmoid(self.preActivationSignal) * (self.backPropagationSignal - self.lastOutput)
         
@@ -137,8 +95,10 @@ class nnetwork:
 
         for i in range(inputLayerCount):
             self.inputLayer.append(nnode(0,self.learningRate,self.numberOfInputs))
+
         for i in range(hiddenLayerCount):
             self.hiddenLayer.append(nnode(1,self.learningRate,len(self.inputLayer)))
+
         for i in range(outputLayerCount):
             self.outputLayer.append(nnode(1,self.learningRate,len(self.hiddenLayer)))
         
@@ -153,6 +113,8 @@ class nnetwork:
         npEdgeBuffer = np.array(edgeBuffer)
         logger.logEvent(str(edgeBuffer),3)
         edgeBuffer = []
+
+
         for i in range(0,len(self.hiddenLayer)):
             self.hiddenLayer[i].inputArray = npEdgeBuffer
             self.hiddenLayer[i].feedForward()
@@ -162,6 +124,8 @@ class nnetwork:
         npEdgeBuffer = np.array(edgeBuffer)
         logger.logEvent(str(edgeBuffer),3)
         edgeBuffer = []
+
+
         for i in range(0,len(self.outputLayer)):
             self.outputLayer[i].inputArray = npEdgeBuffer
             self.outputLayer[i].feedForward()
@@ -173,19 +137,19 @@ class nnetwork:
     
     def backPropagation(self, backPropagationSignals):
         for i in range(0,len(self.outputLayer)):
-            logger.logEvent('iterations in output layer progations:'+str(i),0)
+            logger.logEvent('iterations in output layer progations:'+str(i),5)
             self.outputLayer[i].backPropagationSignal = backPropagationSignals[i]
             self.outputLayer[i].backPropagation()
-            logger.logEvent('current nodes signal to backprop'+str(self.outputLayer[i].inputArray),0)
+            logger.logEvent('current nodes signal to backprop'+str(self.outputLayer[i].inputArray),5)
 
         for i in range(0,len(self.hiddenLayer)):
-            logger.logEvent('iterations in hidden layer progations:'+str(i),0)
+            logger.logEvent('iterations in hidden layer progations:'+str(i),5)
             k = 0
             for j in range(0,len(self.outputLayer)):
                 k += self.outputLayer[j].inputArray[i]
             self.hiddenLayer[i].backPropagationSignal = k/len(self.outputLayer)
             self.hiddenLayer[i].backPropagation()
-            logger.logEvent('current nodes signal to backprop'+str(self.hiddenLayer[i].inputArray),0)
+            logger.logEvent('current nodes signal to backprop'+str(self.hiddenLayer[i].inputArray),5)
 
         for i in range(0,len(self.inputLayer)):
             k = 0
@@ -193,15 +157,7 @@ class nnetwork:
                 k += self.hiddenLayer[j].inputArray[i]
             self.inputLayer[i].backPropagationSignal = k/len(self.outputLayer)
             self.inputLayer[i].backPropagation()
-            logger.logEvent('iterations in inputlayer progations:'+str(i),0)
-
-            
-
-trainingData = [[ 0, 1, 0, 0, 1],
-                [ 1, 1, 1, 1, 0],
-                [ 1, 0, 1, 1, 0],
-                [ 0, 1, 1, 0, 1]]
-
+            logger.logEvent('iterations in inputlayer progations:'+str(i),5)
 
 
 

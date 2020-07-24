@@ -2,6 +2,8 @@
 import numpy as np
 import csv
 from mathTools import *
+from eventLog import *
+logger = eventLog('kmean', '0.1', 0, False)
 
 class kmean() :
     def __init__(self):
