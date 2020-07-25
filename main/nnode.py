@@ -24,8 +24,8 @@ class nnode:
         self.numberOfInputs = numberOfInputs
         self.learningRate = .1
  
-        self.weights =  np.random.rand(self.numberOfInputs)
-        self.bias = random.random()
+        self.weights = np.subtract(np.ones(self.numberOfInputs),np.random.rand(self.numberOfInputs))
+        self.bias = np.random.random()/10
 
         self.lastOutput = np.array([])
         self.preActivationSignal = 0
@@ -36,7 +36,7 @@ class nnode:
 
     def feedForward(self):
         self.flowingDirection = 1
-        #self.preActivationSignal = np.dot(self.inputArray, self.weights) + self.bias
+        self.preActivationSignal = np.dot(self.inputArray, self.weights) + self.bias
         #buildup = 0
 
         #for i in range(self.numberOfInputs):
@@ -62,20 +62,20 @@ class nnode:
 
         if self.mode == 0 : # if this is an input node the 
             for w in range(len(self.weights)) :
-                self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput)
-            #self.bias += self.learningRate * Dsigmoid(self.preActivationSignal) * (self.backPropagationSignal - self.lastOutput)
+                self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput) * 2
+            self.bias +=  sigmoid(self.preActivationSignal) * (self.backPropagationSignal - self.lastOutput)
         elif self.mode == 1 :
            
             for w in range(len(self.weights)) :
                 
-                self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput)
+                self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput) * 2 
                 if (self.weights[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput)) > 0:
                     self.inputArray[w] = 1
                 else:
                     self.inputArray[w] = 0
                 
                 #logger.logEvent('self.weights[w]' + str(self.weights[w]),2)
-            #self.bias +=  self.learningRate * Dsigmoid(self.preActivationSignal) * (self.backPropagationSignal - self.lastOutput)
+            self.bias +=   sigmoid(self.preActivationSignal) * (self.backPropagationSignal - self.lastOutput)
         
         self.backPropagationSignal = 0
 

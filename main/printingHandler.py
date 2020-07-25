@@ -1,6 +1,7 @@
 import random
 import sys
 from os import system, name 
+import time
 
 def clearScreen():
     if name == 'nt': 
@@ -33,7 +34,7 @@ def printGameSpace(gameSpace) :
                     break
             if a == False :
                 if gameSpace.terrainData[x][y] == 0 :
-                        print (colorize(' . ',7,0), end = "")
+                        print (colorize('   ',7,0), end = "")
                 #
                 elif gameSpace.terrainData[x][y] == 1 :
                     print (colorize('░░░',7,0), end = "")
@@ -47,3 +48,4 @@ def printGameSpace(gameSpace) :
             print (colorize('|',2,0))
         if (y == gameSpace.yMax-1 and x == gameSpace.xMax-1):
             print (colorize( vertCaps ,2,0))
+    time.sleep(.1)

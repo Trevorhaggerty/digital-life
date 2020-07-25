@@ -1,5 +1,9 @@
 import numpy as np
+import uuid
 
+def rndID():
+    return uuid.uuid4()
+    
 
 
 #distance and comparison 

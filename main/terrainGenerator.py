@@ -2,6 +2,7 @@
 import random
 from gameSpace import *
 
+from mathTools import *
 from hexTools import *
 from entities import *
 
@@ -137,9 +138,11 @@ def createTerrain(xMax, yMax, seed, spaciousness , water):
     fillSwap(1, 2, gs)
     fillBoarder(2, gs)
     fillEdges(0, 2 , 1 , gs)
-    gs.entityList.append(cell(int(xMax/2) + random.randint(-xMax/4 , xMax/4), (int(yMax/2) + random.randint(-yMax/4 , yMax/4)),[0,0,0,0]))
-    gs.entityList.append(food(int(xMax/2) + random.randint(-xMax/4 , xMax/4), (int(yMax/2) + random.randint(-yMax/4 , yMax/4)), 3))
-    gs.entityList.append(food(int(xMax/2) + random.randint(-xMax/8 , xMax/8), (int(yMax/2) + random.randint(-yMax/8 , yMax/8)), 3))
+    #gs.entityList.append(cell(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),[0,0,0,0]))
+    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))    
+    gs.entityList.append(food(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),3,rndID()))
+    gs.entityList.append(food(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),3,rndID()))
+    gs.entityList.append(food(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),3,rndID()))
     
 
     fillBoarder(1, gs)
@@ -153,5 +156,13 @@ def createTerrain(xMax, yMax, seed, spaciousness , water):
     fillSwap(0, 3, gs)
     bucketFill(gs.entityList[0].x,gs.entityList[0].y, 3, 0, gs)
     fillEdges(1,0,2, gs)
+    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
+    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
+    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
+    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
+    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
+    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
+    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
+    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
 
     return gs
