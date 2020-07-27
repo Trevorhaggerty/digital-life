@@ -4,6 +4,8 @@ import uuid
 def rndID():
     return uuid.uuid4()
     
+def lerp(a , b, t):
+    return a + (b - a) * t
 
 
 #distance and comparison 

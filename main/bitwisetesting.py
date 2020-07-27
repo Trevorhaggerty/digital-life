@@ -6,9 +6,21 @@
 
 
 import sys
+import time
+from os import system, name 
 
-k = 50
-for t in range(k):
+
+grayscalewtb = "$@B%8&WM#oahkbdpqwmZO0QLYXCJUzcvunxrjft/\|()1{}[]?<>i!lI;:+~,.- "
+grayscalebtw = ''.join(reversed(grayscalewtb))
+
+def clearScreen():
+    if name == 'nt': 
+	    _ = system('cls')
+    else: 
+	    _ = system('clear') 
+
+k = 64
+for t in range(-k, k):
     print('i&j&t', end = '')
     for i in range(k):
         if i < 10:
@@ -25,9 +37,10 @@ for t in range(k):
         else:
             print(str(j), end =" : ")
         for i in range(k):
-            if i&j&t < 10:
-                print(str(i&j&t), end ="  ")
-            else:
-                print(str(i&j&t), end =" ")
+            print(str(grayscalebtw[i&j&t]) + str(grayscalebtw[i&j&t ]), end =" ")
         print()
-        sleep()
+    if t > 0:
+        time.sleep(.75)
+    else :
+        time.sleep(.5)
+    clearScreen()

@@ -156,7 +156,12 @@ def createTerrain(xMax, yMax, seed, spaciousness , water):
     fillSwap(0, 3, gs)
     bucketFill(gs.entityList[0].x,gs.entityList[0].y, 3, 0, gs)
     fillEdges(1,0,2, gs)
-    for i in range(16):
-        gs.entityList.append(monster(int(gs.xMax/2),int(gs.yMax/2),[np.random.randint(12736,55203),np.random.randint(0,9),np.random.randint(8,24),np.random.randint(0,9),np.random.randint(8,24),np.random.random()],rndID()))
-   
+    #for i in range(16):
+    #    gs.entityList.append(monster(int(gs.xMax/2),int(gs.yMax/2),[np.random.randint(12736,55203),np.random.randint(0,9),np.random.randint(8,24),np.random.randint(0,9),np.random.randint(8,24),np.random.random()],rndID()))
+    
+    #circle = hexCircle( int(xMax/2) , int(yMax/2) , int((xMax-1)/2))
+    #for i in circle:
+    #    gs.terrainData[i[0]][i[1]] = 3
+    #    print(str(i))
+
     return gs

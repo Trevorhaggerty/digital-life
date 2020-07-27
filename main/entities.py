@@ -3,6 +3,8 @@ import sys
 from nnode import *
 from terrainGenerator import *
 from hexTools import *
+from mathTools import *
+from printingHandler import *
 
 #create the entity classes definition
 class entity :
@@ -184,13 +186,43 @@ class monster(entity) :
                 #print ('ne')
                 self.hearing = [0,1,0,0,0,0]
 
-        vectorBuffer1 = []
         binBuffer = f'{self.HP:04b}'
-        vectorBuffer1 = [int(j) for j in binBuffer]
+        healthSense = [int(j) for j in binBuffer]
 
+        vectorBuffer1 = [0,0,0]
+        vectorBuffer2 = []
+        vectorBuffer3 = []
+        bodyXYZ = hex2t3(self.x,self.y)
+        sightRayCount = 
+        bufferzone = gameSpace(gs.xMax, gs.yMax)
 
+        sightCircle = hexCircle(self.x,self.y, sightrange)
+        for i in sightCircle:
+            sightCircleXYZ = hex2t3(i[0], i[1])
+            for j in range(0,sightrange+1):
+                t = (j/sightrange)
+                vectorBuffer1[0] = int(lerp(bodyXYZ[0],sightCircleXYZ[0],t))
+                vectorBuffer1[1] = int(lerp(bodyXYZ[1],sightCircleXYZ[1],t))
+                vectorBuffer1[2] = int(lerp(bodyXYZ[2],sightCircleXYZ[2],t))
+                vectorBuffer2 = hex3t2(vectorBuffer1[0],vectorBuffer1[1],vectorBuffer1[2])
+                print (str(vectorBuffer2))
+                if int(vectorBuffer2[0]) >= 1 and int(vectorBuffer2[0]) <= gs.xMax - 1 and int(vectorBuffer2[1]) >= 1 and int(vectorBuffer2[1]) <= gs.yMax - 1:
+                    if gs.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] != 0:
+                        vectorBuffer3.append(j)
+                        bufferzone.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] = 2
+                        break
+                    elif j == sightrange:
+                        vectorBuffer3.append(j)
+                        bufferzone.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] = 2
+                        break
+                    else :
+                        bufferzone.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] = 1
+        bufferzone.entityList = entl
+        bufferzone.terrainData[errorbody[0]][errorbody[1]] = 2
+        printGameSpace(bufferzone)
+        print(str(vectorBuffer3))
         self.senseArray = np.concatenate((self.feeling,self.hearing), axis=None)
-        self.senseArray = np.concatenate((self.senseArray,vectorBuffer1), axis=None)
+        self.senseArray = np.concatenate((self.senseArray,healthSense), axis=None)
         #print(str(self.senseArray))
 
         #while finished == False:
@@ -242,6 +274,8 @@ class monster(entity) :
             self.move(np.argmax(self.optimizer()), gs)
         else:
             self.move(np.argmax(self.brain.outputSignals), gs)
+        
+        self.sense(gs, entl)
         return 0
             
 

@@ -52,11 +52,13 @@ def main():
                     count +=1
             if j >= 0:
                 del entl[j]
-            if count <= 2:
-                for ent in entl:
-                    ent.info()
-                    printGameSpace(gs)
-                gameOver = True
+            
+            
+            #if count <= 2:
+            #    for ent in entl:
+            #        ent.info()
+            #        printGameSpace(gs)
+            #    gameOver = True
 
             logger.logEvent('gameTicks : ' + str(gameTick),5)
             gameTick += 1

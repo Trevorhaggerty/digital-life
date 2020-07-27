@@ -3,6 +3,10 @@ import sys
 from os import system, name 
 import time
 
+grayscalewtb = "$@B%8&WM#oahkbdpqwmZO0QLYXCJUzcvunxrjft/\|()1{}[]?<>i!lI;:+~,.- "
+grayscalebtw = ''.join(reversed(grayscalewtb))
+
+
 def clearScreen():
     if name == 'nt': 
 	    _ = system('cls')
@@ -48,4 +52,4 @@ def printGameSpace(gameSpace) :
             print (colorize('|',2,0))
         if (y == gameSpace.yMax-1 and x == gameSpace.xMax-1):
             print (colorize( vertCaps ,2,0))
-    time.sleep(.1)
+    time.sleep(1)
