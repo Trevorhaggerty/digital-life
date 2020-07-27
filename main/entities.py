@@ -193,10 +193,10 @@ class monster(entity) :
         vectorBuffer2 = []
         vectorBuffer3 = []
         bodyXYZ = hex2t3(self.x,self.y)
-        sightRayCount = 
-        bufferzone = gameSpace(gs.xMax, gs.yMax)
-
+        errorbody = hex3t2(bodyXYZ[0],bodyXYZ[1],bodyXYZ[2])
+        sightrange = 49
         sightCircle = hexCircle(self.x,self.y, sightrange)
+        bufferzone = gameSpace(gs.xMax, gs.yMax)
         for i in sightCircle:
             sightCircleXYZ = hex2t3(i[0], i[1])
             for j in range(0,sightrange+1):
