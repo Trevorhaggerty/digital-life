@@ -12,7 +12,7 @@ def hex2t3(x,y):
 
 
 #-------------------------------------------------------------------------------------------------------------
-def checkNeighbor(x, y, target, gameSpace) :
+def binNeighbor(x, y, target, gameSpace) :
     counter = [0,0,0,0,0,0]
     if (y % 2 != 0 and x < gameSpace.xMax - 1 and y < gameSpace.yMax - 1 and x > 0 and y > 0):
     	if (gameSpace.terrainData[x - 1][y - 1] == target) :

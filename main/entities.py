@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 from nnode import *
 from terrainGenerator import *
 from hexTools import *
@@ -15,7 +16,7 @@ class entity :
         self.ID = ID
     
     def move(self, direction, gs):
-        if checkNeighbor(self.x, self.y, 0, gs)[direction] == 1:
+        if binNeighbor(self.x, self.y, 0, gs)[direction] == 1:
             if self.y % 2 != 0:
                 if direction == 0:
                     self.x -= 1
@@ -103,23 +104,26 @@ class food(entity) :
     def info(self):
         return 0
  
-class cell(entity) :
+class monster(entity) :
     #this is the begining function for the subclass
     def __init__(self, x , y, DNA, ID):
         #take on the entity features
         super().__init__(x, y, ID)
         #set the entities type
         self.type = 'monster'
-        self.appearance = [' ꎒ', 1, 0]
         self.DNA = DNA
+        self.appearance = [(" " + chr(self.DNA[0])), self.DNA[1], 0]
         self.age = 0
         self.HP = 15
         self.HPOld = self.HP
         self.senseArray = []
         self.hearing = []
         self.feeling = []
-        self.brain = nnetwork(16,16,12,6,1)
+        self.brain = ffnnetwork(16,self.DNA[2],self.DNA[3],6,self.DNA[4])
+        self.maturity = 10000
         self.inputs = [ 0 for i in range(18)]
+        self.costList = [1]
+        self.cost = 1
     
     def homeostasis(self, entl):
         if self.age % 25 == 0 and self.age > 0:
@@ -132,7 +136,7 @@ class cell(entity) :
     
     def sense(self, gs, entl):
         #wall sensors -------------------------------------------------------------------------
-        vectorBuffer1 = np.logical_not(checkNeighbor(self.x, self.y, 0, gs)).astype(int) 
+        vectorBuffer1 = np.logical_not(binNeighbor(self.x, self.y, 0, gs)).astype(int) 
         self.feeling = vectorBuffer1
         #food sensor---------------------------------------------------------------------------
             #find closest food entity
@@ -195,20 +199,24 @@ class cell(entity) :
 
     def think(self):
         self.brain.feedForward(self.senseArray)
-        vectorBuffer1 = np.subtract(np.multiply(self.hearing,np.array([1.5 for i in range(6)])), self.feeling)
+        
+        self.brain.backPropagation(self.optimizer())
 
+        #print(str(self.brain.outputSignals) + str(self.HP))
+        #print(str(vectorBuffer2))
+        return 0
+
+    def optimizer(self):
+
+        vectorBuffer1 = np.subtract(np.multiply(self.hearing,np.array([1.5 for i in range(6)])), self.feeling)
         vectorBuffer1 = np.add(vectorBuffer1, np.logical_not(self.feeling.astype(int)))
         for i in range(len(vectorBuffer1)):
             if vectorBuffer1[i] < 0:
                 vectorBuffer1[i] = 0
         vectorBuffer2 = [0,0,0,0,0,0]
         vectorBuffer2[np.argmax(vectorBuffer1)] = 1
-
-        self.brain.backPropagation(vectorBuffer1)
-
-        #print(str(self.brain.outputSignals) + str(self.HP))
-        #print(str(vectorBuffer2))
         return vectorBuffer2
+
 
     def mutate(self) :
         return 0
@@ -223,10 +231,16 @@ class cell(entity) :
     def update(self, gs, entl) :
         self.homeostasis(entl)
         self.sense(gs, entl)
-        if self.age%3 == 0:
-            self.move(np.argmax(self.think()), gs)
+        self.think()
+
+        currentCost = pow(sum(np.subtract(self.optimizer() ,self.brain.outputSignals)),2)
+        self.costList.append(currentCost)
+        self.cost = sum(self.costList)/self.age
+        #print (str(self.cost))
+        
+        if self.age <= pow(self.maturity,self.cost):
+            self.move(np.argmax(self.optimizer()), gs)
         else:
-            self.think()
             self.move(np.argmax(self.brain.outputSignals), gs)
         return 0
             
@@ -236,23 +250,32 @@ class cell(entity) :
     def info(self) :
         print('------------------------------------------------------------------------------------------------')
         #info = 'look' + str(self.appearance) + 'sight' + str(self.inputs) + 'outputs' + str(int(self.neuron.axon.telodendrites[0])) 
-        #info = info + "age =" + str(self.age) 
-        print( 'HP : ' + str(self.HP)) #+ "\n"
-        #info = info + "cell memories ---" + (str(self.neuron.memories[0][self.neuron.circadianClock - 1])) + (str(self.neuron.memories[1][self.neuron.circadianClock - 1]))
-        #info = info + "Cell DNA --------->" + str(self.DNA) + "\n"
-        #info = info + "Cell location ---->" + str(self.x) + "," + str(self.y) + "\n"
-        print('monsters weights per layer per node')
-        print('inputlayer:')
-    
+        info = str(self.ID) +","
+        info = info + str(self.age) +","
+        info = info + str(self.HP) + ","
+        info = info + str(self.DNA) + ","
+        info = info + str(self.x) + "," + str(self.y) + ","
+           
         for i in range(len(self.brain.inputLayer)):
-            print(str(self.brain.inputLayer[i].weights))
+            info = info +(str(self.brain.inputLayer[i].weights)) +","
 
-        print('hiddenlayer:')
+        info = info +  ","
         for i in range(len(self.brain.hiddenLayer)):
-            print(str(self.brain.hiddenLayer[i].weights))
-        print('outputlayer:')
+            info = info + (str(self.brain.hiddenLayer[i].weights))+ ","
+        info = info + ","
         for i in range(len(self.brain.outputLayer)):
-            print(str(self.brain.outputLayer[i].weights))
+            info = info + (str(self.brain.outputLayer[i].weights))+ ","
         #return info 
-        return 0
+        x = 0
+        chrValues = open( str(self.ID) + '.txt','x')
+        while x < len(info) :
+            try :
+                print (info[x], end = '')
+                chrValues.write(info[x])
+                x += 1
+            except UnicodeEncodeError as detail :
+                x +=1
+
+        chrValues.close
+        return info
 

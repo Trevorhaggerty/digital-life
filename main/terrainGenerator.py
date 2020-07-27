@@ -61,7 +61,7 @@ def fillGaps(target, targetCount, secondTarget, spread, gameSpace): # if a is su
     count = 0
     for y in range(gameSpace.yMax):
         for x in range(gameSpace.xMax):
-            holeCheck = sum(checkNeighbor(x, y, secondTarget, gameSpace))
+            holeCheck = sum(binNeighbor(x, y, secondTarget, gameSpace))
             if holeCheck > targetCount and gameSpace.terrainData[x][y] == target :
                 gameSpace.terrainData[x][y] = spread
                 count += 1
@@ -71,7 +71,7 @@ def fillEdges(target, secondTarget, spread, gameSpace): # if a is touching any b
     count = 0
     for y in range(gameSpace.yMax):
         for x in range(gameSpace.xMax):
-            edgesDetected = sum(checkNeighbor(x, y, secondTarget, gameSpace))
+            edgesDetected = sum(binNeighbor(x, y, secondTarget, gameSpace))
             if gameSpace.terrainData[x][y] == target and edgesDetected > 0:
                 gameSpace.terrainData[x][y] = spread
                 count += 1
@@ -138,8 +138,8 @@ def createTerrain(xMax, yMax, seed, spaciousness , water):
     fillSwap(1, 2, gs)
     fillBoarder(2, gs)
     fillEdges(0, 2 , 1 , gs)
-    #gs.entityList.append(cell(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),[0,0,0,0]))
-    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))    
+    #gs.entityList.append(monster(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),[0,0,0,0]))
+    gs.entityList.append(monster(int(gs.xMax/2),int(gs.yMax/2),[np.random.randint(12736,55203),1,18,16,1],rndID()))    
     gs.entityList.append(food(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),3,rndID()))
     gs.entityList.append(food(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),3,rndID()))
     gs.entityList.append(food(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),3,rndID()))
@@ -156,13 +156,7 @@ def createTerrain(xMax, yMax, seed, spaciousness , water):
     fillSwap(0, 3, gs)
     bucketFill(gs.entityList[0].x,gs.entityList[0].y, 3, 0, gs)
     fillEdges(1,0,2, gs)
-    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
-    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
-    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
-    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
-    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
-    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
-    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
-    gs.entityList.append(cell(int(gs.xMax/2),int(gs.yMax/2),[0,0,0,0],rndID()))
-
+    for i in range(16):
+        gs.entityList.append(monster(int(gs.xMax/2),int(gs.yMax/2),[np.random.randint(12736,55203),np.random.randint(0,9),np.random.randint(8,24),np.random.randint(0,9),np.random.randint(8,24),np.random.random()],rndID()))
+   
     return gs

@@ -17,72 +17,84 @@ np.random.seed(seed = 1)
 class nnode:
     def __init__(self, mode, learningRate, numberOfInputs):
         self.mode = mode
-        logger.logEvent('mode:' + str(self.mode),7)
-        self.inputArray = np.array([])
-        self.flowingDirection = 0 # -1 for backflowing, 0 for nothing, 1 for forward flowing
-        self.lastInput = np.array([])
         self.numberOfInputs = numberOfInputs
-        self.learningRate = .1
- 
-        self.weights = np.subtract(np.ones(self.numberOfInputs),np.random.rand(self.numberOfInputs))
-        self.bias = np.random.random()/10
+        self.learningRate = learningRate
 
-        self.lastOutput = np.array([])
-        self.preActivationSignal = 0
-        self.outputSignal = 0
-        self.backPropagationSignal = 0
+        if self.mode == 0:
+            logger.logEvent('mode:' + str(self.mode),7)
+            self.inputArray = np.array([])
+            self.flowingDirection = 0 # -1 for backflowing, 0 for nothing, 1 for forward flowing
+            self.lastInput = np.array([])
+    
+            self.weights = np.subtract(np.ones(self.numberOfInputs),np.random.rand(self.numberOfInputs))
+            self.bias = np.random.random()/10
+
+            self.lastOutput = np.array([])
+            self.preActivationSignal = 0
+            self.outputSignal = 0
+            self.backPropagationSignal = 0
+            if self.mode == 1:
+                self.nodeMemState = 0
 
         logger.logEvent('node created with weights :' + str(self.weights),5)
 
     def feedForward(self):
         self.flowingDirection = 1
-        self.preActivationSignal = np.dot(self.inputArray, self.weights) + self.bias
-        #buildup = 0
+        if self.mode == (0):
+            self.preActivationSignal = np.dot(self.inputArray, self.weights) + self.bias
+            #buildup = 0
 
-        #for i in range(self.numberOfInputs):
-        #    buildup = self.inputArray[i] * self.weights[i]
+            #for i in range(self.numberOfInputs):
+            #    buildup = self.inputArray[i] * self.weights[i]
 
-        #self.preActivationSignal = buildup #+ self.bias
-        #self.outputSignal = sigmoid(self.preActivationSignal)
+            #self.preActivationSignal = buildup #+ self.bias
+            #self.outputSignal = sigmoid(self.preActivationSignal)
 
-        logger.logEvent('inputArray' + str(self.inputArray),3)
-        logger.logEvent('weights' + str(self.weights),3)
-        #print(str(self.inputArray) + '   ' + str(self.weights))
-        self.outputSignal = sigmoid(np.dot(self.inputArray, self.weights) + self.bias)
-        self.lastInput = []
-        for i in range(len(self.inputArray)):
-            self.lastInput.append(self.inputArray[i])
-        self.inputArray = np.zeros(shape=(self.numberOfInputs))
-        self.lastOutput = self.outputSignal
-        return self.outputSignal
+            logger.logEvent('inputArray' + str(self.inputArray),3)
+            logger.logEvent('weights' + str(self.weights),3)
+            #print(str(self.inputArray) + '   ' + str(self.weights))
+            self.outputSignal = sigmoid(np.dot(self.inputArray, self.weights) + self.bias)
+            self.lastInput = []
+            for i in range(len(self.inputArray)):
+                self.lastInput.append(self.inputArray[i])
+            self.inputArray = np.zeros(shape=(self.numberOfInputs))
+            self.lastOutput = self.outputSignal
+            return self.outputSignal
+        elif mode == 1 :
+
+            self.preActivationSignal = np.dot(self.inputArray, self.weights) 
 
 
     def backPropagation(self):
         self.flowingDirection = -1
 
-        if self.mode == 0 : # if this is an input node the 
+        if self.mode == 0 : # if this is a hidden node
             for w in range(len(self.weights)) :
-                self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput) * 2
-            self.bias +=  sigmoid(self.preActivationSignal) * (self.backPropagationSignal - self.lastOutput)
-        elif self.mode == 1 :
-           
-            for w in range(len(self.weights)) :
-                
                 self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput) * 2 
                 if (self.weights[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput)) > 0:
                     self.inputArray[w] = 1
                 else:
                     self.inputArray[w] = 0
-                
                 #logger.logEvent('self.weights[w]' + str(self.weights[w]),2)
             self.bias +=   sigmoid(self.preActivationSignal) * (self.backPropagationSignal - self.lastOutput)
+
+        elif self.mode == 1 : # if this is an output node
+            for w in range(len(self.weights)) :
+                self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput) * 2 
+                if (self.weights[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput)) > 0:
+                    self.inputArray[w] = 1
+                else:
+                    self.inputArray[w] = 0
+                #logger.logEvent('self.weights[w]' + str(self.weights[w]),2)
+            self.bias +=   sigmoid(self.preActivationSignal) * (self.backPropagationSignal - self.lastOutput)
+        
         
         self.backPropagationSignal = 0
 
 
 
 
-class nnetwork:
+class ffnnetwork:
     def __init__(self, numberOfInputs=2 ,inputLayerCount = 2, hiddenLayerCount = 2, outputLayerCount = 1, learningRate = 1):
         self.learningRate = learningRate
         self.numberOfInputs = numberOfInputs
@@ -97,10 +109,10 @@ class nnetwork:
             self.inputLayer.append(nnode(0,self.learningRate,self.numberOfInputs))
 
         for i in range(hiddenLayerCount):
-            self.hiddenLayer.append(nnode(1,self.learningRate,len(self.inputLayer)))
+            self.hiddenLayer.append(nnode(0,self.learningRate,len(self.inputLayer)))
 
         for i in range(outputLayerCount):
-            self.outputLayer.append(nnode(1,self.learningRate,len(self.hiddenLayer)))
+            self.outputLayer.append(nnode(0,self.learningRate,len(self.hiddenLayer)))
         
     def feedForward(self,inputData):
         edgeBuffer = []
