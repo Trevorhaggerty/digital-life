@@ -5,6 +5,7 @@ from gameSpace import *
 from mathTools import *
 from hexTools import *
 from entities import *
+from pathfinders import *
 
 
 fillerNumberA = -96
@@ -61,7 +62,7 @@ def fillGaps(target, targetCount, secondTarget, spread, gameSpace): # if a is su
     count = 0
     for y in range(gameSpace.yMax):
         for x in range(gameSpace.xMax):
-            holeCheck = sum(binNeighbor(x, y, secondTarget, gameSpace))
+            holeCheck = sum(binNeighbor(x, y, secondTarget, gameSpace.terrainData))
             if holeCheck > targetCount and gameSpace.terrainData[x][y] == target :
                 gameSpace.terrainData[x][y] = spread
                 count += 1
@@ -71,7 +72,7 @@ def fillEdges(target, secondTarget, spread, gameSpace): # if a is touching any b
     count = 0
     for y in range(gameSpace.yMax):
         for x in range(gameSpace.xMax):
-            edgesDetected = sum(binNeighbor(x, y, secondTarget, gameSpace))
+            edgesDetected = sum(binNeighbor(x, y, secondTarget, gameSpace.terrainData))
             if gameSpace.terrainData[x][y] == target and edgesDetected > 0:
                 gameSpace.terrainData[x][y] = spread
                 count += 1
@@ -148,6 +149,9 @@ def createTerrain(xMax, yMax, seed, spaciousness , water):
     fillBoarder(1, gs)
     fillEdges(2, 0 , 1 , gs)
     fillSwap(2, 1, gs)
+    #for i in range(3):
+    #    gs.entityList.append(monster(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),[np.random.randint(12736,55203),np.random.randint(0,9),np.random.randint(8,24),np.random.randint(0,9),np.random.randint(8,24),np.random.random()],rndID()))
+    
     for i in gs.entityList:
         fillLandingZone(i.x , i.y , 0, gs)
         for j in gs.entityList:
@@ -156,9 +160,12 @@ def createTerrain(xMax, yMax, seed, spaciousness , water):
     fillSwap(0, 3, gs)
     bucketFill(gs.entityList[0].x,gs.entityList[0].y, 3, 0, gs)
     fillEdges(1,0,2, gs)
-    #for i in range(16):
-    #    gs.entityList.append(monster(int(gs.xMax/2),int(gs.yMax/2),[np.random.randint(12736,55203),np.random.randint(0,9),np.random.randint(8,24),np.random.randint(0,9),np.random.randint(8,24),np.random.random()],rndID()))
+    fillSwap(3, 1, gs)
+    fillSwap(2, 1, gs)
     
+    
+
+
     #circle = hexCircle( int(xMax/2) , int(yMax/2) , int((xMax-1)/2))
     #for i in circle:
     #    gs.terrainData[i[0]][i[1]] = 3

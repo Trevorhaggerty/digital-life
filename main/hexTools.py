@@ -1,4 +1,5 @@
 import numpy as np
+from mathTools import *
 
 # --------------------------------------------------------------------------------------------------------------
 
@@ -18,52 +19,51 @@ def hex3t2(x, y, z):
     return [x1, y]
 
 
-def hexCircle(centerx, centery, radius):
-    vectorBuffer = []
+def hexCircle(centerx, centery, radius, sampleRate):
+    vectorBuffer = [0,0]
     hexlist = []
-    for j in range(-radius, radius + 1):
-        for i in range(-radius, radius + 1):
-            if (hexDistance(centerx + i, centery + j, centerx, centery)) == radius:
-                vectorBuffer = [centerx + i, centery + j]
-                hexlist.append(vectorBuffer)
+    for i in range(sampleRate):
+        hexlist.append([int(centerx + radius * (np.cos((lerp(0,360,(i / sampleRate))) * np.pi / 180))) + 1,int(centery + radius * (np.sin((lerp(0,360,(i / sampleRate))) * np.pi / 180)))])
+        #print(str(hexlist))
     return hexlist
+
 
 # -------------------------------------------------------------------------------------------------------------
 
 
-def binNeighbor(x, y, target, gameSpace):
+def binNeighbor(x, y, target, terrainData):
     counter = [0, 0, 0, 0, 0, 0]
-    if (y % 2 != 0 and x < gameSpace.xMax - 1 and y < gameSpace.yMax - 1 and x > 0 and y > 0):
-        if (gameSpace.terrainData[x - 1][y - 1] == target):
+    if (y % 2 != 0 and x < len(terrainData) - 1 and y < len(terrainData[0]) - 1 and x > 0 and y > 0):
+        if (terrainData[x - 1][y - 1] == target):
             counter[0] += 1
-        if (gameSpace.terrainData[x - 0][y - 1] == target):
+        if (terrainData[x - 0][y - 1] == target):
             counter[1] += 1
-        if (gameSpace.terrainData[x + 1][y + 0] == target):
+        if (terrainData[x + 1][y + 0] == target):
             counter[2] += 1
-        if (gameSpace.terrainData[x + 0][y + 1] == target):
+        if (terrainData[x + 0][y + 1] == target):
             counter[3] += 1
-        if (gameSpace.terrainData[x - 1][y + 1] == target):
+        if (terrainData[x - 1][y + 1] == target):
             counter[4] += 1
-        if (gameSpace.terrainData[x - 1][y + 0] == target):
+        if (terrainData[x - 1][y + 0] == target):
             counter[5] += 1
 
-    elif (y % 2 == 0 and x < gameSpace.xMax - 1 and y < gameSpace.yMax - 1 and x > 0 and y > 0):
-        if (gameSpace.terrainData[x + 0][y - 1] == target):
+    elif (y % 2 == 0 and x < len(terrainData) - 1 and y < len(terrainData[0]) - 1 and x > 0 and y > 0):
+        if (terrainData[x + 0][y - 1] == target):
             counter[0] += 1
-        if (gameSpace.terrainData[x + 1][y - 1] == target):
+        if (terrainData[x + 1][y - 1] == target):
             counter[1] += 1
-        if (gameSpace.terrainData[x + 1][y + 0] == target):
+        if (terrainData[x + 1][y + 0] == target):
             counter[2] += 1
-        if (gameSpace.terrainData[x + 1][y + 1] == target):
+        if (terrainData[x + 1][y + 1] == target):
             counter[3] += 1
-        if (gameSpace.terrainData[x + 0][y + 1] == target):
+        if (terrainData[x + 0][y + 1] == target):
             counter[4] += 1
-        if (gameSpace.terrainData[x - 1][y + 0] == target):
+        if (terrainData[x - 1][y + 0] == target):
             counter[5] += 1
 
     return counter
 # ---------------------------------------------------------------------------------------
 
 
-def tileTypeCount(tileType, gameSpace):
-    return gameSpace.terrainData.count(tileType)
+def tileTypeCount(target, terrainData):
+    return terrainData.count(target)

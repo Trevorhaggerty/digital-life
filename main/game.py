@@ -20,7 +20,7 @@ logger = eventLog('Goblin Tentacles Python : cell simulation', '0.1', 5, True)
 
 
 def main():
-    gs = createTerrain(30, 30, 420, 69, False)#datetime.datetime.now(), 69, False)
+    gs = createTerrain(30, 60, 420, 69, False)#datetime.datetime.now(), 69, False)
     entl = gs.entityList
     logger.logEvent('terrain generated',5)
     startTime = time.time()
@@ -30,14 +30,14 @@ def main():
         
         gameOver = False 
         gameTick = 0
-        gs = createTerrain(30, 30, datetime.datetime.now(), 69, False)
+        gs = createTerrain(30, 60, datetime.datetime.now(), 13, False)
         entl = gs.entityList
 
         while gameOver == False:
         
             #clearScreen()
             #logger.logEvent('gameTick:' + str(gameTick) + '--------------------------------------------------------------------------------------',0)
-            printGameSpace(gs)
+            #printGameSpace(gs,1)
             currentTime = (time.time() - startTime)
             
             print(str(currentTime))
@@ -69,7 +69,7 @@ def main():
             if gameTick > 10000:
                 for ent in entl:
                     ent.info()
-                    printGameSpace(gs)
+                    printGameSpace(gs,1)
                 gameOver = True
         
         

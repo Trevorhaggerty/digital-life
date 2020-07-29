@@ -5,7 +5,8 @@ from terrainGenerator import *
 from hexTools import *
 from mathTools import *
 from printingHandler import *
-
+from gameSpace import *
+from pathfinders import *
 #create the entity classes definition
 class entity :
     #all entities will have an x,y location and an type for location in the datastructure
@@ -16,9 +17,10 @@ class entity :
         self.y = y
 
         self.ID = ID
+
     
     def move(self, direction, gs):
-        if binNeighbor(self.x, self.y, 0, gs)[direction] == 1:
+        if binNeighbor(self.x, self.y, 0, gs.terrainData)[direction] == 1:
             if self.y % 2 != 0:
                 if direction == 0:
                     self.x -= 1
@@ -72,6 +74,17 @@ class entity :
         else:
             return -1            #print('the way is blocked')
         
+class redolent(entity) :
+    #this is the begining function for the subclass
+    def __init__(self, x , y, appearance, ID):
+        #take on the entity features
+        super().__init__(x, y, ID)
+        #set the entities type
+        self.ID = ID
+        self.type = 'redolent'
+        self.appearance = appearance
+        self.HP = 1
+        self.age = 0
 
 class food(entity) :
     #this is the begining function for the subclass
@@ -79,6 +92,7 @@ class food(entity) :
         #take on the entity features
         super().__init__(x, y, ID)
         #set the entities type
+        self.ID = ID
         self.type = 'food'
         self.appearance = ['(+)', 2, 0]
         self.HP = HP
@@ -126,6 +140,10 @@ class monster(entity) :
         self.inputs = [ 0 for i in range(18)]
         self.costList = [1]
         self.cost = 1
+        self.imaginationSpace = gameSpace(30, 60)
+        for j in range(len(self.imaginationSpace.terrainData[0])):
+            for i in range(len(self.imaginationSpace.terrainData)):
+                self.imaginationSpace.terrainData[i][j] = 0
     
     def homeostasis(self, entl):
         if self.age % 25 == 0 and self.age > 0:
@@ -138,7 +156,7 @@ class monster(entity) :
     
     def sense(self, gs, entl):
         #wall sensors -------------------------------------------------------------------------
-        vectorBuffer1 = np.logical_not(binNeighbor(self.x, self.y, 0, gs)).astype(int) 
+        vectorBuffer1 = np.logical_not(binNeighbor(self.x, self.y, 0, gs.terrainData)).astype(int) 
         self.feeling = vectorBuffer1
         #food sensor---------------------------------------------------------------------------
             #find closest food entity
@@ -155,6 +173,8 @@ class monster(entity) :
         vectorBuffer1 = []
         vectorBuffer2 = []
         
+        foodTargetVector = [entl[intBuffer].x,entl[intBuffer].y]
+
         vectorBuffer1 = hex2t3(entl[intBuffer].x,entl[intBuffer].y)
         vectorBuffer2 = hex2t3(self.x, self.y)
 
@@ -193,38 +213,50 @@ class monster(entity) :
         vectorBuffer2 = []
         vectorBuffer3 = []
         bodyXYZ = hex2t3(self.x,self.y)
-        errorbody = hex3t2(bodyXYZ[0],bodyXYZ[1],bodyXYZ[2])
-        sightrange = 49
-        sightCircle = hexCircle(self.x,self.y, sightrange)
-        bufferzone = gameSpace(gs.xMax, gs.yMax)
+        sightrange = 15
+        raycount = 15
+        sightCircle = hexCircle(self.x,self.y, sightrange, raycount)
+        sightSamplerate = 15
+
+        self.imaginationSpace.entityList = [redolent(self.x,self.y,self.appearance,rndID)]
+
         for i in sightCircle:
-            sightCircleXYZ = hex2t3(i[0], i[1])
-            for j in range(0,sightrange+1):
-                t = (j/sightrange)
-                vectorBuffer1[0] = int(lerp(bodyXYZ[0],sightCircleXYZ[0],t))
-                vectorBuffer1[1] = int(lerp(bodyXYZ[1],sightCircleXYZ[1],t))
-                vectorBuffer1[2] = int(lerp(bodyXYZ[2],sightCircleXYZ[2],t))
+            sightCircleXYZ = hex2t3(i[0], i[1])        
+            for j in range(0,sightSamplerate):
+                t = (j/sightSamplerate)
+                vectorBuffer1[0] = int(round(lerp(bodyXYZ[0],sightCircleXYZ[0],t)))
+                vectorBuffer1[1] = int(round(lerp(bodyXYZ[1],sightCircleXYZ[1],t)))
+                vectorBuffer1[2] = int(round(lerp(bodyXYZ[2],sightCircleXYZ[2],t)))
                 vectorBuffer2 = hex3t2(vectorBuffer1[0],vectorBuffer1[1],vectorBuffer1[2])
-                print (str(vectorBuffer2))
+                #print (str(vectorBuffer2))
                 if int(vectorBuffer2[0]) >= 1 and int(vectorBuffer2[0]) <= gs.xMax - 1 and int(vectorBuffer2[1]) >= 1 and int(vectorBuffer2[1]) <= gs.yMax - 1:
                     if gs.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] != 0:
-                        vectorBuffer3.append(j)
-                        bufferzone.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] = 2
+                        vectorBuffer3.append(hexDistance(vectorBuffer2[0],vectorBuffer2[1],self.x,self.y))
+                        self.imaginationSpace.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] = gs.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])]
                         break
                     elif j == sightrange:
-                        vectorBuffer3.append(j)
-                        bufferzone.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] = 2
+                        vectorBuffer3.append(hexDistance(vectorBuffer2[0],vectorBuffer2[1],self.x,self.y))
+                        self.imaginationSpace.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] = gs.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])]
                         break
                     else :
-                        bufferzone.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] = 1
-        bufferzone.entityList = entl
-        bufferzone.terrainData[errorbody[0]][errorbody[1]] = 2
-        printGameSpace(bufferzone)
+                        for i in entl:
+                            if int(vectorBuffer2[0]) == i.x and int(vectorBuffer2[1]) == i.y:
+                                self.imaginationSpace.entityList.append(redolent(i.x,i.y,i.appearance,rndID()))
+                                break
+                        self.imaginationSpace.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] = gs.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])]
+                else: break
         print(str(vectorBuffer3))
         self.senseArray = np.concatenate((self.feeling,self.hearing), axis=None)
         self.senseArray = np.concatenate((self.senseArray,healthSense), axis=None)
-        #print(str(self.senseArray))
 
+        vectorBuffer1 = [self.x, self.y]
+        pathfound = pathFinding(gs.terrainData,0,vectorBuffer1,foodTargetVector,1)
+        
+        print(str(pathfound))
+        #for i in pathfound:
+        #    self.imaginationSpace.terrainData[i[0]][i[1]] = -2
+        #printGameSpace(self.imaginationSpace, 0.05)
+        #print(str(self.senseArray))
         #while finished == False:
         #    min_typex = min(enumerate(vectorBuffer1)
         return 0
