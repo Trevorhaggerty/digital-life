@@ -10,7 +10,9 @@ from pathfinders import *
 
 fillerNumberA = -96
 fillerNumberB = -69
-#----------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------
+
+
 def fillLandingZone(x, y, spread, gameSpace):
     if x <= 2:
         x += 2
@@ -21,9 +23,9 @@ def fillLandingZone(x, y, spread, gameSpace):
         y += 2
     elif y >= gameSpace.yMax:
         y -= 2
-    
+
     gameSpace.terrainData[x][y] = spread
-    if (y % 2 != 0) :
+    if (y % 2 != 0):
         gameSpace.terrainData[x - 1][y - 1] = spread
         gameSpace.terrainData[x - 0][y - 1] = spread
         gameSpace.terrainData[x - 1][y + 0] = spread
@@ -31,7 +33,7 @@ def fillLandingZone(x, y, spread, gameSpace):
         gameSpace.terrainData[x - 1][y + 1] = spread
         gameSpace.terrainData[x + 0][y + 1] = spread
 
-    elif y % 2 == 0:	 		  
+    elif y % 2 == 0:
         gameSpace.terrainData[x + 0][y - 1] = spread
         gameSpace.terrainData[x + 1][y - 1] = spread
         gameSpace.terrainData[x - 1][y + 0] = spread
@@ -39,16 +41,20 @@ def fillLandingZone(x, y, spread, gameSpace):
         gameSpace.terrainData[x + 0][y + 1] = spread
         gameSpace.terrainData[x + 1][y + 1] = spread
     return 0
-#----------------------------------------------------------------------
-def fillScattered(target,spread, percentChance, gameSpace):
+# ----------------------------------------------------------------------
+
+
+def fillScattered(target, spread, percentChance, gameSpace):
     count = 0
     for y in range(gameSpace.yMax):
         for x in range(gameSpace.xMax):
-            if random.randint(0,100) % int(100/percentChance) == 0 and gameSpace.terrainData[x][y] == target:
+            if random.randint(0, 100) % int(100/percentChance) == 0 and gameSpace.terrainData[x][y] == target:
                 gameSpace.terrainData[x][y] = spread
                 count += 1
     return count
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
+
+
 def fillSwap(target, spread, gameSpace):
     count = 0
     for y in range(gameSpace.yMax):
@@ -57,70 +63,85 @@ def fillSwap(target, spread, gameSpace):
                 gameSpace.terrainData[x][y] = spread
                 count += 1
     return count
-#-----------------------------------------------------------------------
-def fillGaps(target, targetCount, secondTarget, spread, gameSpace): # if a is surrounded by b many c's make a become d
+# -----------------------------------------------------------------------
+
+
+# if a is surrounded by b many c's make a become d
+def fillGaps(target, targetCount, secondTarget, spread, gameSpace):
     count = 0
     for y in range(gameSpace.yMax):
         for x in range(gameSpace.xMax):
-            holeCheck = sum(binNeighbor(x, y, secondTarget, gameSpace.terrainData))
-            if holeCheck > targetCount and gameSpace.terrainData[x][y] == target :
+            holeCheck = sum(binNeighbor(
+                x, y, secondTarget, gameSpace.terrainData))
+            if holeCheck > targetCount and gameSpace.terrainData[x][y] == target:
                 gameSpace.terrainData[x][y] = spread
                 count += 1
     return count
-#-----------------------------------------------------------------------
-def fillEdges(target, secondTarget, spread, gameSpace): # if a is touching any b make a become c
+# -----------------------------------------------------------------------
+
+
+# if a is touching any b make a become c
+def fillEdges(target, secondTarget, spread, gameSpace):
     count = 0
     for y in range(gameSpace.yMax):
         for x in range(gameSpace.xMax):
-            edgesDetected = sum(binNeighbor(x, y, secondTarget, gameSpace.terrainData))
+            edgesDetected = sum(binNeighbor(
+                x, y, secondTarget, gameSpace.terrainData))
             if gameSpace.terrainData[x][y] == target and edgesDetected > 0:
                 gameSpace.terrainData[x][y] = spread
                 count += 1
     return count
-#---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+
+
 def fillBoarder(spread, gameSpace):
     count = 0
     for i in range(gameSpace.xMax):
         gameSpace.terrainData[i][0] = spread
         gameSpace.terrainData[i][gameSpace.yMax - 1] = spread
-        count +=2
+        count += 2
     for i in range(gameSpace.yMax):
         gameSpace.terrainData[0][i] = spread
         gameSpace.terrainData[gameSpace.xMax - 1][i] = spread
-        count +=2
+        count += 2
     return count
-#----------------------------------------------------------------------------
-def fillBCurve(x1 , y1, x2, y2, target, spread, h, gameSpace):
+# ----------------------------------------------------------------------------
+
+
+def fillBCurve(x1, y1, x2, y2, target, spread, h, gameSpace):
     count = 0
     x3 = random.randint(0, int(gameSpace.xMax / (4 * h)))
     y3 = random.randint(0, int(gameSpace.yMax / (4 * h)))
     h = h * 10
     k = 0
-    while k < 1 :
+    while k < 1:
         for y in range(gameSpace.yMax):
             for x in range(gameSpace.xMax):
-                if (x >= int(((1 - (k)) * (1 - (k)) * (x1) + h * (1 - (k)) * (k) *	(x3 ) + (k) * (k) * (x2)))
-				and y >= int(((1 - (k)) * (1 - (k)) * (y1) + h * (1 - (k)) * (k) *	(y3 ) + (k) * (k) * (y2)))													
-				and x <= int(((1 - (k)) * (1 - (k)) * (x1) + h * (1 - (k)) * (k) *	(x3 ) + (k) * (k) * (x2)))
-				and y <= int(((1 - (k)) * (1 - (k)) * (y1) + h * (1 - (k)) * (k) *	(y3 ) + (k) * (k) * (y2)))) :
+                if (x >= int(((1 - (k)) * (1 - (k)) * (x1) + h * (1 - (k)) * (k) * (x3) + (k) * (k) * (x2)))
+                    and y >= int(((1 - (k)) * (1 - (k)) * (y1) + h * (1 - (k)) * (k) * (y3) + (k) * (k) * (y2)))
+                    and x <= int(((1 - (k)) * (1 - (k)) * (x1) + h * (1 - (k)) * (k) * (x3) + (k) * (k) * (x2)))
+                        and y <= int(((1 - (k)) * (1 - (k)) * (y1) + h * (1 - (k)) * (k) * (y3) + (k) * (k) * (y2)))):
                     if gameSpace.terrainData[x][y] == target:
                         gameSpace.terrainData[x][y] = spread
-                        count +=1
+                        count += 1
         k += 0.005
-#---------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------
 
-def bucketFill(x , y, target, spread, gameSpace):
+
+def bucketFill(x, y, target, spread, gameSpace):
     gameSpace.terrainData[x][y] = fillerNumberA
     spreading = 1
     while spreading > 0:
-        change = fillEdges(target,fillerNumberA,fillerNumberB,gameSpace)
-        change += fillEdges(target,fillerNumberB,fillerNumberA,gameSpace)
+        change = fillEdges(target, fillerNumberA, fillerNumberB, gameSpace)
+        change += fillEdges(target, fillerNumberB, fillerNumberA, gameSpace)
         spreading = change
     fillSwap(fillerNumberA, fillerNumberB, gameSpace)
-    count = fillSwap(fillerNumberB,spread,gameSpace)
+    count = fillSwap(fillerNumberB, spread, gameSpace)
     return count
 
-#--------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+
+
 def countHexType(target, gameSpace):
     count = 0
     for y in range(gameSpace.yMax):
@@ -128,46 +149,48 @@ def countHexType(target, gameSpace):
             if gameSpace.terrainData[x][y] == target:
                 count += 1
     return count
-#--------------------------------------------------------------------
+# --------------------------------------------------------------------
 
-def createTerrain(xMax, yMax, seed, spaciousness , water):
+
+def createTerrain(xMax, yMax, seed, spaciousness, water):
     gs = gameSpace(xMax, yMax)
     random.seed(seed)
-    fillScattered(0,1, 100 - spaciousness, gs)
-    fillGaps(0, 4, 1 , 1, gs)
-    fillGaps(1, 3, 0 , 0, gs)
+    fillScattered(0, 1, 100 - spaciousness, gs)
+    fillGaps(0, 4, 1, 1, gs)
+    fillGaps(1, 3, 0, 0, gs)
     fillSwap(1, 2, gs)
     fillBoarder(2, gs)
-    fillEdges(0, 2 , 1 , gs)
+    fillEdges(0, 2, 1, gs)
     #gs.entityList.append(monster(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),[0,0,0,0]))
-    gs.entityList.append(monster(int(gs.xMax/2),int(gs.yMax/2),[np.random.randint(12736,55203),1,18,16,1],rndID()))    
-    gs.entityList.append(food(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),3,rndID()))
-    gs.entityList.append(food(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),3,rndID()))
-    gs.entityList.append(food(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),3,rndID()))
-    
+    gs.entityList.append(monster(int(gs.xMax/2), int(gs.yMax/2),
+                                 [np.random.randint(12736, 55203), 1, 32, 16, 1], rndID()))
+    gs.entityList.append(food(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),
+                              random.randint(int(gs.yMax/7), int(gs.yMax*6/7)), 3, rndID()))
+    gs.entityList.append(food(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),
+                              random.randint(int(gs.yMax/7), int(gs.yMax*6/7)), 3, rndID()))
+    gs.entityList.append(food(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),
+                              random.randint(int(gs.yMax/7), int(gs.yMax*6/7)), 3, rndID()))
 
     fillBoarder(1, gs)
-    fillEdges(2, 0 , 1 , gs)
+    fillEdges(2, 0, 1, gs)
     fillSwap(2, 1, gs)
-    #for i in range(3):
-    #    gs.entityList.append(monster(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),random.randint(int(gs.yMax/7), int(gs.yMax*6/7)),[np.random.randint(12736,55203),np.random.randint(0,9),np.random.randint(8,24),np.random.randint(0,9),np.random.randint(8,24),np.random.random()],rndID()))
-    
+    for i in range(2):
+        gs.entityList.append(monster(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)), random.randint(int(gs.yMax/7), int(gs.yMax*6/7)), [
+                             np.random.randint(12736, 55203), np.random.randint(0, 9), np.random.randint(24, 46), np.random.randint(6, 18), np.random.random()], rndID()))
+
     for i in gs.entityList:
-        fillLandingZone(i.x , i.y , 0, gs)
+        fillLandingZone(i.x, i.y, 0, gs)
         for j in gs.entityList:
-            fillBCurve(i.x, i.y, j.x, j.y,1, 3 , 4, gs)
-    
+            fillBCurve(i.x, i.y, j.x, j.y, 1, 3, 4, gs)
+
     fillSwap(0, 3, gs)
-    bucketFill(gs.entityList[0].x,gs.entityList[0].y, 3, 0, gs)
-    fillEdges(1,0,2, gs)
+    bucketFill(gs.entityList[0].x, gs.entityList[0].y, 3, 0, gs)
+    fillEdges(1, 0, 2, gs)
     fillSwap(3, 1, gs)
     fillSwap(2, 1, gs)
-    
-    
-
 
     #circle = hexCircle( int(xMax/2) , int(yMax/2) , int((xMax-1)/2))
-    #for i in circle:
+    # for i in circle:
     #    gs.terrainData[i[0]][i[1]] = 3
     #    print(str(i))
 

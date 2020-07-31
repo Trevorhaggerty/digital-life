@@ -6,7 +6,6 @@ from printingHandler import *
 from entities import *
 
 
-
 class sTile:
     def __init__(self, x, y, passablity):
         self.x = x
@@ -18,38 +17,52 @@ class sTile:
     def info(self):
         return str(self.x) + ' , ' + str(self.y) + ' , ' + str(self.passablity) + ' , ' + str(self.whereParentDirection) + ' , ' + str(self.knownValue)
 
+
 class cursorC:
-    #all entities will have an x,y location and an type for location in the datastructure
+    # all entities will have an x,y location and an type for location in the datastructure
     def __init__(self, x, y, path):
-        #fill the x
+        # fill the x
         self.x = x
-        #fill the y
+        # fill the y
         self.y = y
 
         self.path = path
 
 
-
 def printSTileMap(sTileMap, home, goal, cursor):
     clearScreen()
+    print()
     for y in range(len(sTileMap[0])):
-        if y%2 == 0 :
-            print('  ', end = '')
+        if y % 2 == 0:
+            print(' ', end='')
+        print('   ', end='')
         for x in range(len(sTileMap)):
             if x == home[0] and y == home[1]:
-                print("HOM", end = ' ')
+                print("HOM", end=' ')
             elif x == goal[0] and y == goal[1]:
                 print("GOL", end=' ')
             elif x == cursor.x and y == cursor.y:
                 print("CUR", end=' ')
             elif sTileMap[x][y].whereParentDirection == -1:
-                if sTileMap[x][y].passablity == True:         
-                    print('   ', end = ' ')
+                if sTileMap[x][y].passablity == True:
+                    print('   ', end=' ')
                 else:
-                    print('xxx', end = ' ')
+                    print('xxx', end=' ')
             else:
-                print(' ' + str(sTileMap[x][y].whereParentDirection), end='  ')
+                if sTileMap[x][y].whereParentDirection == 0:
+                    print(' ↖', end='  ')
+                elif sTileMap[x][y].whereParentDirection == 1:
+                    print(' ↗', end='  ')
+                elif sTileMap[x][y].whereParentDirection == 2:
+                    print(' ➡', end='  ')
+                elif sTileMap[x][y].whereParentDirection == 3:
+                    print(' ↘', end='  ')
+                elif sTileMap[x][y].whereParentDirection == 4:
+                    print(' ↙', end='  ')
+                elif sTileMap[x][y].whereParentDirection == 5:
+                    print(' ⬅', end='  ')
         print()
+
 
 def stNeighbor(x, y, target, sTileMap):
     counter = [0, 0, 0, 0, 0, 0]
@@ -87,26 +100,26 @@ def stNeighbor(x, y, target, sTileMap):
 def iteratePathfind(currentStep, sTileMap):  # if a is touching any b make a become c
     for y in range(len(sTileMap[0])):
         for x in range(len(sTileMap)):
-            
+
             detectedVector = stNeighbor(x, y, currentStep-1, sTileMap)
             edgesDetected = sum(detectedVector)
 
-            whereParentvector = [detectedVector[3],detectedVector[4],detectedVector[5],detectedVector[0],detectedVector[1],detectedVector[2]]
+            whereParentvector = [detectedVector[3], detectedVector[4],
+                                 detectedVector[5], detectedVector[0], detectedVector[1], detectedVector[2]]
             parentDirection = np.argmax(whereParentvector)
 
             #parentDirection = np.argmax(detectedVector)
 
             if sTileMap[x][y].passablity == True and edgesDetected > 0 and sTileMap[x][y].knownValue == None:
-                
+
                 sTileMap[x][y].knownValue = currentStep
                 sTileMap[x][y].whereParentDirection = parentDirection
-
 
     return sTileMap
 
 
 def movesTileCursor(cursor, sTileMap):
-    cursor.path.insert(0,sTileMap[cursor.x][cursor.y].whereParentDirection)
+    cursor.path.insert(0, sTileMap[cursor.x][cursor.y].whereParentDirection)
     if cursor.y % 2 != 0:
         if cursor.path[0] == 3:
             cursor.x -= 1
@@ -158,11 +171,14 @@ def movesTileCursor(cursor, sTileMap):
             cursor.y += 0
             return 1
     else:
-        return -1            #print('the way is blocked')
+        return -1  # print('the way is blocked')
 
 # ---------------------------------------------------------------------------------------
 # starting and ending 2d locations with a 2 evenr hexagon binmap
-def pathFinding(givenMap, passableTile, home, goal, outtype = 0): #outtype 0 = is directions # outtype 1 is the tiles x,y data
+
+
+# outtype 0 = is directions # outtype 1 is the tiles x,y data
+def pathFinding(givenMap, passableTile, home, goal, outtype=0):
     sTileMap = [[0 for x in range(len(givenMap[0]))]
                 for x in range(len(givenMap))]
     for j in range(len(givenMap[0])):
@@ -171,27 +187,27 @@ def pathFinding(givenMap, passableTile, home, goal, outtype = 0): #outtype 0 = i
                 sTileMap[i][j] = sTile(i, j, True)
             else:
                 sTileMap[i][j] = sTile(i, j, False)
-            #print(sTileMap[i][j].info())
-    cursor = cursorC(goal[0],goal[1],[])
+            # print(sTileMap[i][j].info())
+    cursor = cursorC(goal[0], goal[1], [])
     sTileMap[home[0]][home[1]].knownValue = 0
-    print(sTileMap[home[0]][home[1]].info())
+    # print(sTileMap[home[0]][home[1]].info())
     currentStep = 0
     while sTileMap[goal[0]][goal[1]].knownValue == None:
         sTileMap = iteratePathfind(currentStep, sTileMap)
-        currentStep +=1
+        currentStep += 1
         if currentStep > 100:
             break
         printSTileMap(sTileMap, home, goal, cursor)
-    print(str(currentStep))
+    # print(str(currentStep))
     sTileMap = iteratePathfind(currentStep, sTileMap)
-    print(sTileMap[goal[0]][goal[1]].info())
+    # print(sTileMap[goal[0]][goal[1]].info())
     pathxy = []
     count = 0
     while cursor.x != home[0] or cursor.y != home[1]:
         movesTileCursor(cursor, sTileMap)
 
         if outtype == 1:
-            pathxy.insert(0,[cursor.x,cursor.y])
+            pathxy.insert(0, [cursor.x, cursor.y])
         if count > sTileMap[goal[0]][goal[1]].knownValue:
             break
         count += 1

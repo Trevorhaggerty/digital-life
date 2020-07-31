@@ -18,7 +18,7 @@ def colorize(text,forground, background):
     return text
 
 def printGameSpace(gameSpace,delay) :
-    #clearScreen()
+    clearScreen()
     vertCaps = ("@-" + "____" * gameSpace.xMax + "-@")
     for y in range(gameSpace.yMax) :
         for x in range(gameSpace.xMax) :

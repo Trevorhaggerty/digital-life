@@ -14,17 +14,19 @@ def hex2t3(x, y):
     z1 = -x1 - y1
     return [x1, y1, z1]
 
+
 def hex3t2(x, y, z):
-    x1 = int(x + (y + (y&1))/2)
+    x1 = int(x + (y + (y & 1))/2)
     return [x1, y]
 
 
 def hexCircle(centerx, centery, radius, sampleRate):
-    vectorBuffer = [0,0]
+    vectorBuffer = [0, 0]
     hexlist = []
     for i in range(sampleRate):
-        hexlist.append([int(centerx + radius * (np.cos((lerp(0,360,(i / sampleRate))) * np.pi / 180))) + 1,int(centery + radius * (np.sin((lerp(0,360,(i / sampleRate))) * np.pi / 180)))])
-        #print(str(hexlist))
+        hexlist.append([int(centerx + radius * (np.cos((lerp(0, 360, (i / sampleRate))) * np.pi / 180))) +
+                        1, int(centery + radius * (np.sin((lerp(0, 360, (i / sampleRate))) * np.pi / 180)))])
+        # print(str(hexlist))
     return hexlist
 
 

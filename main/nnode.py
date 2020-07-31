@@ -1,18 +1,19 @@
-#the tuna node
+# the tuna node
 
-#Imports---------------------------------------------------------
+# Imports---------------------------------------------------------
 import numpy as np
 import random
 from eventLog import *
 from mathTools import *
 
-#Global-Variable-Initialization-----------------------------------
-#  name of program, version Number, priorityBias 
-logger = eventLog('staticNeuralNet','0.3', 10, False) 
-#logger copy paste template:    logger.logEvent('' + str(),10)
+# Global-Variable-Initialization-----------------------------------
+#  name of program, version Number, priorityBias
+logger = eventLog('staticNeuralNet', '0.3', 10, False)
+# logger copy paste template:    logger.logEvent('' + str(),10)
 
 logger.priorityBias = 1
-np.random.seed(seed = 1)
+np.random.seed(seed=1)
+
 
 class nnode:
     def __init__(self, mode, learningRate, numberOfInputs):
@@ -21,12 +22,13 @@ class nnode:
         self.learningRate = learningRate
 
         if self.mode == 0:
-            logger.logEvent('mode:' + str(self.mode),7)
+            logger.logEvent('mode:' + str(self.mode), 7)
             self.inputArray = np.array([])
-            self.flowingDirection = 0 # -1 for backflowing, 0 for nothing, 1 for forward flowing
+            self.flowingDirection = 0  # -1 for backflowing, 0 for nothing, 1 for forward flowing
             self.lastInput = np.array([])
-    
-            self.weights = np.subtract(np.ones(self.numberOfInputs),np.random.rand(self.numberOfInputs))
+
+            self.weights = np.subtract(
+                np.ones(self.numberOfInputs), np.random.rand(self.numberOfInputs))
             self.bias = np.random.random()/10
 
             self.lastOutput = np.array([])
@@ -36,69 +38,56 @@ class nnode:
             if self.mode == 1:
                 self.nodeMemState = 0
 
-        logger.logEvent('node created with weights :' + str(self.weights),5)
+        logger.logEvent('node created with weights :' + str(self.weights), 5)
 
     def feedForward(self):
         self.flowingDirection = 1
         if self.mode == (0):
-            self.preActivationSignal = np.dot(self.inputArray, self.weights) + self.bias
-            #buildup = 0
-
-            #for i in range(self.numberOfInputs):
-            #    buildup = self.inputArray[i] * self.weights[i]
-
-            #self.preActivationSignal = buildup #+ self.bias
-            #self.outputSignal = sigmoid(self.preActivationSignal)
-
-            logger.logEvent('inputArray' + str(self.inputArray),3)
-            logger.logEvent('weights' + str(self.weights),3)
-            #print(str(self.inputArray) + '   ' + str(self.weights))
-            self.outputSignal = sigmoid(np.dot(self.inputArray, self.weights) + self.bias)
+            self.preActivationSignal = np.dot(
+                self.inputArray, self.weights) + self.bias
+            logger.logEvent('inputArray' + str(self.inputArray), 3)
+            logger.logEvent('weights' + str(self.weights), 3)
+            self.outputSignal = sigmoid(
+                np.dot(self.inputArray, self.weights) + self.bias)
             self.lastInput = []
             for i in range(len(self.inputArray)):
                 self.lastInput.append(self.inputArray[i])
             self.inputArray = np.zeros(shape=(self.numberOfInputs))
             self.lastOutput = self.outputSignal
             return self.outputSignal
-        elif mode == 1 :
-
-            self.preActivationSignal = np.dot(self.inputArray, self.weights) 
-
-
+        elif mode == 1:
+            self.preActivationSignal = np.dot(self.inputArray, self.weights)
     def backPropagation(self):
         self.flowingDirection = -1
-
-        if self.mode == 0 : # if this is a hidden node
-            for w in range(len(self.weights)) :
-                self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput) * 2 
+        if self.mode == 0: 
+            for w in range(len(self.weights)):
+                self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(
+                    self.lastOutput) * (self.backPropagationSignal - self.lastOutput) * 2
                 if (self.weights[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput)) > 0:
                     self.inputArray[w] = 1
                 else:
                     self.inputArray[w] = 0
-                #logger.logEvent('self.weights[w]' + str(self.weights[w]),2)
-            self.bias +=   sigmoid(self.preActivationSignal) * (self.backPropagationSignal - self.lastOutput)
-
-        elif self.mode == 1 : # if this is an output node
-            for w in range(len(self.weights)) :
-                self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput) * 2 
+                logger.logEvent('self.weights[w]' + str(self.weights[w]),2)
+            self.bias += sigmoid(self.preActivationSignal) * \
+                (self.backPropagationSignal - self.lastOutput)
+        elif self.mode == 1:
+            for w in range(len(self.weights)):
+                self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(
+                    self.lastOutput) * (self.backPropagationSignal - self.lastOutput) * 2
                 if (self.weights[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput)) > 0:
                     self.inputArray[w] = 1
                 else:
                     self.inputArray[w] = 0
-                #logger.logEvent('self.weights[w]' + str(self.weights[w]),2)
-            self.bias +=   sigmoid(self.preActivationSignal) * (self.backPropagationSignal - self.lastOutput)
-        
-        
+                logger.logEvent('self.weights[w]' + str(self.weights[w]),2)
+            self.bias += sigmoid(self.preActivationSignal) * \
+                (self.backPropagationSignal - self.lastOutput)
         self.backPropagationSignal = 0
 
 
-
-
 class ffnnetwork:
-    def __init__(self, numberOfInputs=2 ,inputLayerCount = 2, hiddenLayerCount = 2, outputLayerCount = 1, learningRate = 1):
+    def __init__(self, numberOfInputs=2, inputLayerCount=2, hiddenLayerCount=2, outputLayerCount=1, learningRate=1):
         self.learningRate = learningRate
         self.numberOfInputs = numberOfInputs
-
 
         self.outputSignals = []
         self.inputLayer = []
@@ -106,39 +95,40 @@ class ffnnetwork:
         self.outputLayer = []
 
         for i in range(inputLayerCount):
-            self.inputLayer.append(nnode(0,self.learningRate,self.numberOfInputs))
+            self.inputLayer.append(
+                nnode(0, self.learningRate, self.numberOfInputs))
 
         for i in range(hiddenLayerCount):
-            self.hiddenLayer.append(nnode(0,self.learningRate,len(self.inputLayer)))
+            self.hiddenLayer.append(
+                nnode(0, self.learningRate, len(self.inputLayer)))
 
         for i in range(outputLayerCount):
-            self.outputLayer.append(nnode(0,self.learningRate,len(self.hiddenLayer)))
-        
-    def feedForward(self,inputData):
+            self.outputLayer.append(
+                nnode(0, self.learningRate, len(self.hiddenLayer)))
+
+    def feedForward(self, inputData):
         edgeBuffer = []
-        for i in range(0,len(self.inputLayer)):
+        for i in range(0, len(self.inputLayer)):
             self.inputLayer[i].inputArray = np.array(inputData)
             self.inputLayer[i].feedForward()
             logger.logEvent(str(i), 3)
             logger.logEvent(str(self.inputLayer[i].outputSignal), 3)
             edgeBuffer.append((self.inputLayer[i].outputSignal))
         npEdgeBuffer = np.array(edgeBuffer)
-        logger.logEvent(str(edgeBuffer),3)
+        logger.logEvent(str(edgeBuffer), 3)
         edgeBuffer = []
 
-
-        for i in range(0,len(self.hiddenLayer)):
+        for i in range(0, len(self.hiddenLayer)):
             self.hiddenLayer[i].inputArray = npEdgeBuffer
             self.hiddenLayer[i].feedForward()
             logger.logEvent(str(i), 3)
             logger.logEvent(str(self.hiddenLayer[i].outputSignal), 3)
             edgeBuffer.append(self.hiddenLayer[i].outputSignal)
         npEdgeBuffer = np.array(edgeBuffer)
-        logger.logEvent(str(edgeBuffer),3)
+        logger.logEvent(str(edgeBuffer), 3)
         edgeBuffer = []
 
-
-        for i in range(0,len(self.outputLayer)):
+        for i in range(0, len(self.outputLayer)):
             self.outputLayer[i].inputArray = npEdgeBuffer
             self.outputLayer[i].feedForward()
             logger.logEvent(str(i), 3)
@@ -146,50 +136,49 @@ class ffnnetwork:
             edgeBuffer.append(self.outputLayer[i].outputSignal)
         self.outputSignals = edgeBuffer
         return 1
-    
+
     def backPropagation(self, backPropagationSignals):
-        for i in range(0,len(self.outputLayer)):
-            logger.logEvent('iterations in output layer progations:'+str(i),5)
+        for i in range(0, len(self.outputLayer)):
+            logger.logEvent('iterations in output layer progations:'+str(i), 5)
             self.outputLayer[i].backPropagationSignal = backPropagationSignals[i]
             self.outputLayer[i].backPropagation()
-            logger.logEvent('current nodes signal to backprop'+str(self.outputLayer[i].inputArray),5)
+            logger.logEvent('current nodes signal to backprop' +
+                            str(self.outputLayer[i].inputArray), 5)
 
-        for i in range(0,len(self.hiddenLayer)):
-            logger.logEvent('iterations in hidden layer progations:'+str(i),5)
+        for i in range(0, len(self.hiddenLayer)):
+            logger.logEvent('iterations in hidden layer progations:'+str(i), 5)
             k = 0
-            for j in range(0,len(self.outputLayer)):
+            for j in range(0, len(self.outputLayer)):
                 k += self.outputLayer[j].inputArray[i]
             self.hiddenLayer[i].backPropagationSignal = k/len(self.outputLayer)
             self.hiddenLayer[i].backPropagation()
-            logger.logEvent('current nodes signal to backprop'+str(self.hiddenLayer[i].inputArray),5)
+            logger.logEvent('current nodes signal to backprop' +
+                            str(self.hiddenLayer[i].inputArray), 5)
 
-        for i in range(0,len(self.inputLayer)):
+        for i in range(0, len(self.inputLayer)):
             k = 0
-            for j in range(0,len(self.hiddenLayer)):
+            for j in range(0, len(self.hiddenLayer)):
                 k += self.hiddenLayer[j].inputArray[i]
             self.inputLayer[i].backPropagationSignal = k/len(self.outputLayer)
             self.inputLayer[i].backPropagation()
-            logger.logEvent('iterations in inputlayer progations:'+str(i),5)
+            logger.logEvent('iterations in inputlayer progations:'+str(i), 5)
 
 
-
-
-
-#def main():
-#    
+# def main():
+#
 #    nn = nnetwork(3,3,6,2,1)
 #    epochs = 10000
 #    #costOverTime = []
 #    while epochs > 0:
 #        rightAnswer = []
-#        
+#
 #        currentTrainingData = []
 #        for i in range(len(trainingData[0])):
 #            currentTrainingData.append(trainingData[epochs % 4][i])
 #        rightAnswer.append(currentTrainingData.pop())
 #        rightAnswer.append(currentTrainingData.pop())
 #        logger.logEvent('current training data' + str(currentTrainingData),1)
-#        
+#
 #        nn.feedForward(np.array(currentTrainingData))
 #        logger.logEvent('         current right answer :  ' + str(rightAnswer), 2)
 #        logger.logEvent('                    nn output :  ' + str(nn.outputSignals), 2)
@@ -207,4 +196,4 @@ class ffnnetwork:
 #    #logger.logEvent('output:' + str(node1.outputSignal),1)
 #
 #
-#main()
+# main()

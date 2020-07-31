@@ -111,7 +111,7 @@ class food(entity) :
     def teleport(self, gs):
         looking = True
         while looking:
-            x , y = np.random.randint(3,gs.xMax - 3), np.random.randint(3,gs.xMax - 3)
+            x , y = np.random.randint(4,gs.xMax - 3), np.random.randint(4,gs.xMax - 3)
             if gs.terrainData[x][y] == 0:
                 self.x = x
                 self.y = y
@@ -135,12 +135,14 @@ class monster(entity) :
         self.senseArray = []
         self.hearing = []
         self.feeling = []
-        self.brain = ffnnetwork(16,self.DNA[2],self.DNA[3],6,self.DNA[4])
-        self.maturity = 10000
+        self.brain = ffnnetwork(31,self.DNA[2],self.DNA[3],6,self.DNA[4])
+        self.maturity = 1000
         self.inputs = [ 0 for i in range(18)]
         self.costList = [1]
         self.cost = 1
-        self.imaginationSpace = gameSpace(30, 60)
+        self.foodTargetVector = []
+        self.optimizerVector = []
+        self.imaginationSpace = gameSpace(20, 30)
         for j in range(len(self.imaginationSpace.terrainData[0])):
             for i in range(len(self.imaginationSpace.terrainData)):
                 self.imaginationSpace.terrainData[i][j] = 0
@@ -173,7 +175,7 @@ class monster(entity) :
         vectorBuffer1 = []
         vectorBuffer2 = []
         
-        foodTargetVector = [entl[intBuffer].x,entl[intBuffer].y]
+        self.foodTargetVector = [entl[intBuffer].x,entl[intBuffer].y]
 
         vectorBuffer1 = hex2t3(entl[intBuffer].x,entl[intBuffer].y)
         vectorBuffer2 = hex2t3(self.x, self.y)
@@ -217,10 +219,11 @@ class monster(entity) :
         raycount = 15
         sightCircle = hexCircle(self.x,self.y, sightrange, raycount)
         sightSamplerate = 15
-
+        count = -1
         self.imaginationSpace.entityList = [redolent(self.x,self.y,self.appearance,rndID)]
-
+        vectorBuffer3 = np.zeros(raycount)
         for i in sightCircle:
+            count +=1
             sightCircleXYZ = hex2t3(i[0], i[1])        
             for j in range(0,sightSamplerate):
                 t = (j/sightSamplerate)
@@ -231,31 +234,36 @@ class monster(entity) :
                 #print (str(vectorBuffer2))
                 if int(vectorBuffer2[0]) >= 1 and int(vectorBuffer2[0]) <= gs.xMax - 1 and int(vectorBuffer2[1]) >= 1 and int(vectorBuffer2[1]) <= gs.yMax - 1:
                     if gs.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] != 0:
-                        vectorBuffer3.append(hexDistance(vectorBuffer2[0],vectorBuffer2[1],self.x,self.y))
+                        vectorBuffer3[count] = (hexDistance(vectorBuffer2[0],vectorBuffer2[1],self.x,self.y))
                         self.imaginationSpace.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] = gs.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])]
                         break
                     elif j == sightrange:
-                        vectorBuffer3.append(hexDistance(vectorBuffer2[0],vectorBuffer2[1],self.x,self.y))
+                        vectorBuffer3[count] = (hexDistance(vectorBuffer2[0],vectorBuffer2[1],self.x,self.y))
                         self.imaginationSpace.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] = gs.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])]
                         break
                     else :
                         for i in entl:
                             if int(vectorBuffer2[0]) == i.x and int(vectorBuffer2[1]) == i.y:
+                                vectorBuffer3[count] = (hexDistance(vectorBuffer2[0],vectorBuffer2[1],self.x,self.y))
                                 self.imaginationSpace.entityList.append(redolent(i.x,i.y,i.appearance,rndID()))
                                 break
-                        self.imaginationSpace.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] = gs.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])]
-                else: break
-        print(str(vectorBuffer3))
+                        #self.imaginationSpace.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])] = gs.terrainData[int(vectorBuffer2[0])][int(vectorBuffer2[1])]
+                else: 
+                    vectorBuffer3[count] = 15
+                    break
+            
+        #print(str(vectorBuffer3))
         self.senseArray = np.concatenate((self.feeling,self.hearing), axis=None)
         self.senseArray = np.concatenate((self.senseArray,healthSense), axis=None)
+        self.senseArray = np.concatenate((self.senseArray,vectorBuffer3), axis=None)
 
         vectorBuffer1 = [self.x, self.y]
-        pathfound = pathFinding(gs.terrainData,0,vectorBuffer1,foodTargetVector,1)
+        pathfound = pathFinding(self.imaginationSpace.terrainData,0,vectorBuffer1,self.foodTargetVector,1)
         
-        print(str(pathfound))
-        #for i in pathfound:
-        #    self.imaginationSpace.terrainData[i[0]][i[1]] = -2
-        #printGameSpace(self.imaginationSpace, 0.05)
+        #print(str(pathfound))
+        for i in pathfound:
+            self.imaginationSpace.terrainData[i[0]][i[1]] = -2
+        printGameSpace(self.imaginationSpace, 0.5)
         #print(str(self.senseArray))
         #while finished == False:
         #    min_typex = min(enumerate(vectorBuffer1)
@@ -264,21 +272,27 @@ class monster(entity) :
     def think(self):
         self.brain.feedForward(self.senseArray)
         
-        self.brain.backPropagation(self.optimizer())
+        self.brain.backPropagation(self.optimizerVector)
 
         #print(str(self.brain.outputSignals) + str(self.HP))
         #print(str(vectorBuffer2))
         return 0
 
     def optimizer(self):
+        for y in range(self.imaginationSpace.yMax):
+            for x in range(self.imaginationSpace.xMax):
+                if self.imaginationSpace.terrainData[x][y] == -2:
+                    self.imaginationSpace.terrainData[x][y] = 0
+        vectorBuffer1 = pathFinding(self.imaginationSpace.terrainData,0,[self.x,self.y],self.foodTargetVector)
+        try:
+            if len(pathFinding) > 0:
+                vectorBuffer2[vectorBuffer1[0]] = 1
+        except TypeError as errorDetail:
+            print(errorDetail)
+            vectorBuffer2 = np.logical_not([self.senseArray[0],self.senseArray[1],self.senseArray[2],self.senseArray[3],self.senseArray[4],self.senseArray[5]])
 
-        vectorBuffer1 = np.subtract(np.multiply(self.hearing,np.array([1.5 for i in range(6)])), self.feeling)
-        vectorBuffer1 = np.add(vectorBuffer1, np.logical_not(self.feeling.astype(int)))
-        for i in range(len(vectorBuffer1)):
-            if vectorBuffer1[i] < 0:
-                vectorBuffer1[i] = 0
-        vectorBuffer2 = [0,0,0,0,0,0]
-        vectorBuffer2[np.argmax(vectorBuffer1)] = 1
+            
+        self.optimizerVector = vectorBuffer2
         return vectorBuffer2
 
 
@@ -295,19 +309,21 @@ class monster(entity) :
     def update(self, gs, entl) :
         self.homeostasis(entl)
         self.sense(gs, entl)
+        self.optimizer()
         self.think()
 
-        currentCost = pow(sum(np.subtract(self.optimizer() ,self.brain.outputSignals)),2)
+        currentCost = pow(sum(np.subtract(self.optimizerVector ,self.brain.outputSignals)),2)
         self.costList.append(currentCost)
         self.cost = sum(self.costList)/self.age
         #print (str(self.cost))
         
-        if self.age <= pow(self.maturity,self.cost):
-            self.move(np.argmax(self.optimizer()), gs)
-        else:
-            self.move(np.argmax(self.brain.outputSignals), gs)
+        #if self.age <= self.maturity*self.cost:
+        #    self.move(np.argmax(self.optimizerVector), gs)
+        #else:
+        #    self.move(np.argmax(self.brain.outputSignals), gs)
+        self.move(np.argmax(self.brain.outputSignals), gs)
         
-        self.sense(gs, entl)
+        #self.sense(gs, entl)
         return 0
             
 
