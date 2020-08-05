@@ -197,7 +197,7 @@ def pathFinding(givenMap, passableTile, home, goal, outtype=0):
         currentStep += 1
         if currentStep > 100:
             break
-        printSTileMap(sTileMap, home, goal, cursor)
+        #printSTileMap(sTileMap, home, goal, cursor)
     # print(str(currentStep))
     sTileMap = iteratePathfind(currentStep, sTileMap)
     # print(sTileMap[goal[0]][goal[1]].info())
@@ -211,7 +211,7 @@ def pathFinding(givenMap, passableTile, home, goal, outtype=0):
         if count > sTileMap[goal[0]][goal[1]].knownValue:
             break
         count += 1
-        printSTileMap(sTileMap, home, goal, cursor)
+        #printSTileMap(sTileMap, home, goal, cursor)
     if outtype == 1:
         return pathxy
     return cursor.path

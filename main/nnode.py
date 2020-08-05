@@ -14,7 +14,25 @@ logger = eventLog('staticNeuralNet', '0.3', 10, False)
 logger.priorityBias = 1
 np.random.seed(seed=1)
 
-
+# ----------------------------------------------------------------------------------------
+# nnode is a node for neural networks. 
+#   it takes in:
+#       - the mode of the neuron 0 = feed forward, 1 = rnn, 2 = lstm, 3 = kmean
+#       - the learning rate of the node
+#       - the number of inputs for the sizing weight vector
+#   it contains:
+#       - the mode of the neuron
+#       -
+#       -
+#       - mode 0 - 
+#       - mode 0 -
+#       - mode 0 -
+#       - mode 0 -
+#       - mode 0 -
+#       - mode 0 -
+#       - mode 0 -
+#       - mode 0 -
+#       - mode 0 -
 class nnode:
     def __init__(self, mode, learningRate, numberOfInputs):
         self.mode = mode
@@ -35,8 +53,6 @@ class nnode:
             self.preActivationSignal = 0
             self.outputSignal = 0
             self.backPropagationSignal = 0
-            if self.mode == 1:
-                self.nodeMemState = 0
 
         logger.logEvent('node created with weights :' + str(self.weights), 5)
 
@@ -55,8 +71,6 @@ class nnode:
             self.inputArray = np.zeros(shape=(self.numberOfInputs))
             self.lastOutput = self.outputSignal
             return self.outputSignal
-        elif mode == 1:
-            self.preActivationSignal = np.dot(self.inputArray, self.weights)
     def backPropagation(self):
         self.flowingDirection = -1
         if self.mode == 0: 
@@ -70,130 +84,7 @@ class nnode:
                 logger.logEvent('self.weights[w]' + str(self.weights[w]),2)
             self.bias += sigmoid(self.preActivationSignal) * \
                 (self.backPropagationSignal - self.lastOutput)
-        elif self.mode == 1:
-            for w in range(len(self.weights)):
-                self.weights[w] += self.lastInput[w] * self.learningRate * Dsigmoid(
-                    self.lastOutput) * (self.backPropagationSignal - self.lastOutput) * 2
-                if (self.weights[w] * self.learningRate * Dsigmoid(self.lastOutput) * (self.backPropagationSignal - self.lastOutput)) > 0:
-                    self.inputArray[w] = 1
-                else:
-                    self.inputArray[w] = 0
-                logger.logEvent('self.weights[w]' + str(self.weights[w]),2)
-            self.bias += sigmoid(self.preActivationSignal) * \
-                (self.backPropagationSignal - self.lastOutput)
         self.backPropagationSignal = 0
 
 
-class ffnnetwork:
-    def __init__(self, numberOfInputs=2, inputLayerCount=2, hiddenLayerCount=2, outputLayerCount=1, learningRate=1):
-        self.learningRate = learningRate
-        self.numberOfInputs = numberOfInputs
 
-        self.outputSignals = []
-        self.inputLayer = []
-        self.hiddenLayer = []
-        self.outputLayer = []
-
-        for i in range(inputLayerCount):
-            self.inputLayer.append(
-                nnode(0, self.learningRate, self.numberOfInputs))
-
-        for i in range(hiddenLayerCount):
-            self.hiddenLayer.append(
-                nnode(0, self.learningRate, len(self.inputLayer)))
-
-        for i in range(outputLayerCount):
-            self.outputLayer.append(
-                nnode(0, self.learningRate, len(self.hiddenLayer)))
-
-    def feedForward(self, inputData):
-        edgeBuffer = []
-        for i in range(0, len(self.inputLayer)):
-            self.inputLayer[i].inputArray = np.array(inputData)
-            self.inputLayer[i].feedForward()
-            logger.logEvent(str(i), 3)
-            logger.logEvent(str(self.inputLayer[i].outputSignal), 3)
-            edgeBuffer.append((self.inputLayer[i].outputSignal))
-        npEdgeBuffer = np.array(edgeBuffer)
-        logger.logEvent(str(edgeBuffer), 3)
-        edgeBuffer = []
-
-        for i in range(0, len(self.hiddenLayer)):
-            self.hiddenLayer[i].inputArray = npEdgeBuffer
-            self.hiddenLayer[i].feedForward()
-            logger.logEvent(str(i), 3)
-            logger.logEvent(str(self.hiddenLayer[i].outputSignal), 3)
-            edgeBuffer.append(self.hiddenLayer[i].outputSignal)
-        npEdgeBuffer = np.array(edgeBuffer)
-        logger.logEvent(str(edgeBuffer), 3)
-        edgeBuffer = []
-
-        for i in range(0, len(self.outputLayer)):
-            self.outputLayer[i].inputArray = npEdgeBuffer
-            self.outputLayer[i].feedForward()
-            logger.logEvent(str(i), 3)
-            logger.logEvent(str(self.outputLayer[i].outputSignal), 3)
-            edgeBuffer.append(self.outputLayer[i].outputSignal)
-        self.outputSignals = edgeBuffer
-        return 1
-
-    def backPropagation(self, backPropagationSignals):
-        for i in range(0, len(self.outputLayer)):
-            logger.logEvent('iterations in output layer progations:'+str(i), 5)
-            self.outputLayer[i].backPropagationSignal = backPropagationSignals[i]
-            self.outputLayer[i].backPropagation()
-            logger.logEvent('current nodes signal to backprop' +
-                            str(self.outputLayer[i].inputArray), 5)
-
-        for i in range(0, len(self.hiddenLayer)):
-            logger.logEvent('iterations in hidden layer progations:'+str(i), 5)
-            k = 0
-            for j in range(0, len(self.outputLayer)):
-                k += self.outputLayer[j].inputArray[i]
-            self.hiddenLayer[i].backPropagationSignal = k/len(self.outputLayer)
-            self.hiddenLayer[i].backPropagation()
-            logger.logEvent('current nodes signal to backprop' +
-                            str(self.hiddenLayer[i].inputArray), 5)
-
-        for i in range(0, len(self.inputLayer)):
-            k = 0
-            for j in range(0, len(self.hiddenLayer)):
-                k += self.hiddenLayer[j].inputArray[i]
-            self.inputLayer[i].backPropagationSignal = k/len(self.outputLayer)
-            self.inputLayer[i].backPropagation()
-            logger.logEvent('iterations in inputlayer progations:'+str(i), 5)
-
-
-# def main():
-#
-#    nn = nnetwork(3,3,6,2,1)
-#    epochs = 10000
-#    #costOverTime = []
-#    while epochs > 0:
-#        rightAnswer = []
-#
-#        currentTrainingData = []
-#        for i in range(len(trainingData[0])):
-#            currentTrainingData.append(trainingData[epochs % 4][i])
-#        rightAnswer.append(currentTrainingData.pop())
-#        rightAnswer.append(currentTrainingData.pop())
-#        logger.logEvent('current training data' + str(currentTrainingData),1)
-#
-#        nn.feedForward(np.array(currentTrainingData))
-#        logger.logEvent('         current right answer :  ' + str(rightAnswer), 2)
-#        logger.logEvent('                    nn output :  ' + str(nn.outputSignals), 2)
-#        #costOverTime.append(rightAnswer - .outputSignal)
-#        nn.backPropagation(np.array(rightAnswer))
-#
-#        #logger.logEvent(str(sum(costOverTime)/len(costOverTime)) + " is the cost", 3)
-#        logger.logEvent(str(10000 - epochs) + " epochs have passed---------------------------------------------------------", 2)
-#        epochs -= 1
-#
-#    #logger.logEvent('weights : ' + str(node1.weights),1)
-#    #node1.inputArray = np.array([1,0,0])
-#    #logger.logEvent('inputs [1,0,0]',1)
-#    #node1.feedForward()
-#    #logger.logEvent('output:' + str(node1.outputSignal),1)
-#
-#
-# main()

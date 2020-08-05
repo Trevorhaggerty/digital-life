@@ -53,7 +53,7 @@ class kmean() :
                 dbuffer = []
                 for j in range(len(self.centroids)):
                     #print(str(self.dataset[i]))
-                    dbuffer.append(wmdDistance(self.centroids[j], self.dataset[i], self.weights))
+                    dbuffer.append(wvDistance(self.centroids[j], self.dataset[i], self.weights))
                     #print('distance of vector to perspective centroids = ' + str(dbuffer))
                     #print(str(dataset[i]) + ' is closest to centroid ' + str(np.argmin(np.array(dbuffer))))
                 self.kGroups[(np.argmin(np.array(dbuffer)))].append(self.dataset[i])
