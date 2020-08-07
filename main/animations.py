@@ -1,29 +1,23 @@
 
-
-batAnim = [' ∨ ',
+#animations is a python file that holds lists of ascii animation frames
+batAnim = [ ' ∨ ',
             ' ∧ ',
             ' ⁀ ',
             ' ⏤ ',
             ' ‿ ']
 
-goblinAnim = [' ,া',
+goblinAnim = [  ' ,া',
                 ' ,ৗ', 
                 ' ,ী',
-                ' ,ৗ ', ]
+                ' ,ৗ', ]
 
-foodAnim= [' ✚ ',
+foodAnim= [     ' ✚ ',
                 ' ✛ ',
                 ' ⭑ ', 
                 ' ✛ ', ]
 
-waterAnim= ['   ',
-                '   ',
-                '   ', ]
+waterAnim= ['']
 
-spiderAnim = ['Ⰿ'
+spiderAnim = [' Ⰿ ']
 
-
-
-]
-
-humanAnim  = ['ꕍ']
+humanAnim  = [' ꕍ ']

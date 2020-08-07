@@ -351,12 +351,12 @@ def createTerrain(xMax, yMax, seed, spaciousness, water):
     fillEdges(0, 2, 1, td)
 
     #monster creation loop; itterates per range
-    for i in range(3):
+    for i in range(6):
         #create the monster entity with random locations and 'DNA'
         gs.entityList.append(monster(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)), random.randint(int(gs.yMax/7), int(gs.yMax*6/7)), [10199, np.random.randint(0, 9), 63, 24, np.random.random()], rndID()))
 
     #food creation loop; itterates per range
-    for i in range(3):
+    for i in range(5):
         #create three food pellets at random locations throughout the map
         gs.entityList.append(food(random.randint(int(gs.xMax/7), int(gs.xMax*6/7)),
                                 random.randint(int(gs.yMax/7), int(gs.yMax*6/7)), 3, rndID()))

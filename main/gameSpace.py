@@ -1,5 +1,22 @@
+from mathTools import rndID
+
 # ----------------------------------------------------------------------------------------
-# gameSpace is an object that holds all of the data pertaining to the game play space
+# Hextile is an object that holds the properties of the tiles that compose the gameSpace
+#   they retain information about the substance and reactivity of the tile.
+#   it contains:
+#       - an ID for keeping track of individual tiles (uuid4)
+#       - the tiles type (int)
+class tile:
+    #it requires no inputs to spawn but can be heavily modified later on
+    def __init__(self):
+        self.ID = rndID
+        self.tileType = 0
+
+# ----------------------------------------------------------------------------------------
+
+
+# ----------------------------------------------------------------------------------------
+# gameSpace is an object that holds all of the data pertaining to the gamePlay space
 #   it takes in:
 #       - the maximum x and y, thus the size of the gameSpace
 #   it contains:
@@ -18,8 +35,11 @@ class gameSpace:
         #the terrain data
         self.terrainData = [
             #made with each element holding an int of 0
-            [0 for x in range(self.yMax)] for x in range(self.xMax)]
+            [0 for x in range(self.yMax)] for x in range(self.xMax)]        
         #completely empty array for entity list
         self.entityList = []
+        #the time keeping value
         self.tick = 0
+        #the times the screen has been printed
         self.screenCount = 0
+# ----------------------------------------------------------------------------------------

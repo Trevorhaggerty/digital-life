@@ -74,17 +74,19 @@ def main():
                     count += 1
             # if the j is a valid positive index
             if j >= 0:
-                # remove the entity from the list
-                del entl[j]
+                #check to see if this is the last monster
+                if count >= 2:
+                    # remove the entity from the list
+                    del entl[j]
 
-            # if there are 2 or less entities on the board
-            if count <= 2:
+            # if theRE CAN BE ONLY 1!!!
+            if count <= 1:
                 # iterate through the entity list
                 for ent in entl:
                     # save and print the monsters information
                     ent.info()
                 # print the current game state at end
-                printGameSpace(gs, 1)
+                    printGameSpace(gs, [int(gs.xMax/2), int(gs.yMax/2)], [gs.xMax,gs.yMax], 0.05)
                 # set the sessions end status to true
                 gameOver = True
 
@@ -97,7 +99,7 @@ def main():
                     # save and print the monsters information
                     ent.info()
                 # print the current game state at end
-                printGameSpace(gs, 1)
+                    printGameSpace(gs, [int(gs.xMax/2), int(gs.yMax/2)], [gs.xMax,gs.yMax], 0.05)
                 # set the sessions end status to true
                 gameOver = True
 
@@ -113,6 +115,6 @@ def main():
                         # save and print the monsters information
                         ent.info()
                     # print the current game state at end
-                    printGameSpace(gs, 1)
+                    printGameSpace(gs, [int(gs.xMax/2), int(gs.yMax/2)], [gs.xMax,gs.yMax], 0.05)
                     # set the sessions end status to true
                     gameOver = True
